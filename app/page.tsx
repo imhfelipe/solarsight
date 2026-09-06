@@ -721,38 +721,6 @@ export default function UnifiedSolarSightPage() {
         {/* ================= ABA 5: RESUMO DO PROJETO (README GITHUB STYLE) ================= */}
         {activeTab === "tab5" && (
           <div className="space-y-6 animate-step-transition max-w-5xl mx-auto font-sans">
-            {/* Header Estilo Repositório GitHub */}
-            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ea580c]">
-                  <BookOpen className="w-5 h-5 text-[#ea580c]" />
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="text-xs text-slate-500 font-mono">felipe / SolarSight</span>
-                    <span className="text-[10px] bg-slate-100 text-slate-700 border border-slate-300 px-2 py-0.5 rounded-full font-bold">Public Repository</span>
-                  </div>
-                  <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
-                    README.md — Visão Geral & Documentação de Funcionamento
-                  </h2>
-                </div>
-              </div>
-
-              <div className="flex items-center gap-2 text-xs font-mono">
-                <span className="bg-slate-100 border border-slate-300 text-slate-700 px-3 py-1 rounded-lg font-bold">
-                  main branch
-                </span>
-                <a
-                  href="https://solarsight-chi.vercel.app"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="bg-[#ea580c] hover:bg-orange-600 text-white px-3.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5"
-                >
-                  Ver Deploy na Nuvem &rarr;
-                </a>
-              </div>
-            </div>
-
             {/* Documentação Markdown Estilo GitHub README */}
             <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm space-y-8 text-slate-800 leading-relaxed text-sm">
               {/* Título Principal */}
