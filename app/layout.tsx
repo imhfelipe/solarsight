@@ -17,7 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "SolarSight — Plataforma Preditiva de Geração Fotovoltaica (TCC FAESA)",
   description:
-    "Plataforma preditiva stateless para dimensionamento e estimativa de geração fotovoltaica no Espírito Santo com modelo de transposição Liu-Jordan, Google Solar API e Marco Legal GD (Lei 14.300/2022).",
+    "Plataforma preditiva stateless para dimensionamento e estimativa de geração fotovoltaica no Espírito Santo com modelo de transposição Liu-Jordan, PVWatts (NREL) e Marco Legal GD (Lei 14.300/2022).",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

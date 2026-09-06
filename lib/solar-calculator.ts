@@ -59,7 +59,7 @@ export interface FutureSolarPredictionResult {
   monthlyForecast: MonthlyForecastPoint[];
   yearlyProjections: YearProjectionPoint[];
   estimatedSoilingLossPercent: number;
-  googleSolarInsightSource: string;
+  nrelPVWattsSource: string;
 }
 
 export interface ValidationSystemResult {
@@ -270,8 +270,8 @@ export function runFutureSolarPrediction(
     estimatedPaybackYears: paybackYears,
     monthlyForecast,
     yearlyProjections,
-    estimatedSoilingLossPercent: Number((SOILING_LOSS_THRESHOLD * 100).toFixed(1)),
-    googleSolarInsightSource: "Metodologia Google Solar API (Building Insights & Fluxo Irradiação) + NASA POWER Climatology",
+    estimatedSoilingLossPercent: 3.5,
+    nrelPVWattsSource: "Modelo Preditivo PVWatts (NREL / Sandia / Perez Model) + NASA POWER Climatology",
   };
 }
 

@@ -234,15 +234,15 @@ export default function UnifiedSolarSightPage() {
             {/* Banner de Apresentação do Simulador */}
             {currentStep === 1 && (
               <div className="text-center space-y-3 mb-8 max-w-3xl mx-auto pt-2">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-[#ea580c] text-xs font-semibold uppercase tracking-wider">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-[#ea580c] text-xs font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>METODOLOGIA GOOGLE SOLAR API & NASA POWER GHI</span>
+                  <span>METODOLOGIA PVWATTS (NREL) & NASA POWER GHI</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
-                  Qualifique o Potencial Solar em Minutos
+                  Qualifique o Potencial Solar Residencial em Vitória - ES
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-                  Desenhe o telhado em imagem de satélite, calcule o azimute automaticamente via Turf.js e obtenha o diagnóstico preditivo imediato conforme o Google Solar API.
+                  Desenhe o telhado sobre a imagem de satélite, receba a sugestão geométrica assistida de azimute via Turf.js e obtenha a previsão preditiva imediata pelo modelo PVWatts (NREL).
                 </p>
               </div>
             )}
@@ -459,7 +459,7 @@ export default function UnifiedSolarSightPage() {
                       <th className="p-4">Critério de Avaliação</th>
                       <th className="p-4 text-slate-500">SunData (CRESESB/CEPEL)</th>
                       <th className="p-4 text-slate-500">PVGIS (União Europeia)</th>
-                      <th className="p-4 text-[#ea580c] font-bold bg-orange-50">SolarSight (FAESA TCC & Google Solar)</th>
+                      <th className="p-4 text-[#ea580c] font-bold bg-orange-50">SolarSight (FAESA TCC & PVWatts/NREL)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-700">
@@ -468,7 +468,7 @@ export default function UnifiedSolarSightPage() {
                       <td className="p-4 text-slate-500">Não possui (Apenas ponto geográfico)</td>
                       <td className="p-4 text-slate-500">Não possui (Apenas coordenadas)</td>
                       <td className="p-4 text-[#ea580c] font-bold bg-orange-50/50">
-                        Polígono Vetorial Real + Google Solar Building Insights (m²)
+                        Polígono Vetorial Real + Modelo PVWatts (NREL / Sandia)
                       </td>
                     </tr>
                     <tr>
@@ -602,7 +602,7 @@ export default function UnifiedSolarSightPage() {
                 Ecossistema de APIs, Bibliotecas & Motor Preditivo
               </h2>
               <p className="text-sm text-slate-600">
-                Documentação visual das camadas de dados, geoprocessamento, Google Solar API e bibliotecas matemáticas do SolarSight.
+                Documentação visual das camadas de dados, geoprocessamento, modelo PVWatts (NREL) e bibliotecas matemáticas do SolarSight.
               </p>
             </div>
 
@@ -615,8 +615,8 @@ export default function UnifiedSolarSightPage() {
                 </div>
                 <div className="space-y-3 text-xs">
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="font-bold text-[#ea580c] block">Google Solar API (Building Insights)</span>
-                    <p className="text-slate-600 mt-0.5">Potencial solar de edifícios e modelagem de irradiação.</p>
+                    <span className="font-bold text-[#ea580c] block">PVWatts / NREL Model (Perez & Sandia)</span>
+                    <p className="text-slate-600 mt-0.5">Modelo público de irradiação solar incidental (POA) e estimativa de geração.</p>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <span className="font-bold text-[#ea580c] block">NASA POWER Climatology API</span>
@@ -637,7 +637,7 @@ export default function UnifiedSolarSightPage() {
                 <div className="space-y-3 text-xs">
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <span className="font-bold text-[#ea580c] block">Turf.js (@turf/area & @turf/bearing)</span>
-                    <p className="text-slate-600 mt-0.5">Cálculo de área WGS84 e rumo de aresta de telhado.</p>
+                    <p className="text-slate-600 mt-0.5">Cálculo de área WGS84 e rumo assistido de aresta de telhado.</p>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <span className="font-bold text-[#ea580c] block">Leaflet + Leaflet Draw</span>
@@ -685,9 +685,9 @@ export default function UnifiedSolarSightPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-700">
                     <tr>
-                      <td className="p-3.5 font-mono text-[#ea580c] font-semibold">https://solar.googleapis.com/v1/buildingInsights</td>
-                      <td className="p-3.5">Potencial solar e dados de radiação Google Solar API</td>
-                      <td className="p-3.5"><span className="bg-orange-50 text-[#ea580c] border border-orange-200 font-bold px-2.5 py-0.5 rounded-full">Integrado / Referenciado</span></td>
+                      <td className="p-3.5 font-mono text-[#ea580c] font-semibold">PVWatts / NREL Model (Client-Side)</td>
+                      <td className="p-3.5">Modelo matemático público de radiação incidental (POA) e estimativa PVWatts/NREL</td>
+                      <td className="p-3.5"><span className="bg-orange-50 text-[#ea580c] border border-orange-200 font-bold px-2.5 py-0.5 rounded-full">Integrado (Zero-Token)</span></td>
                     </tr>
                     <tr>
                       <td className="p-3.5 font-mono text-[#ea580c] font-semibold">https://power.larc.nasa.gov/api</td>

@@ -85,7 +85,7 @@ export function StepMap({ location, initialAreaM2, onAreaConfirmed, onBack }: St
               <div className="flex items-center justify-between">
                 <span className="font-extrabold text-[#ea580c] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-[#ea580c] animate-pulse" />
-                  Orientação Automática do Telhado Detectada (Turf.js)
+                  Sugestão Geométrica Assistida com Confirmação Manual (Turf.js)
                 </span>
                 <span className="text-[10px] font-mono bg-white text-[#ea580c] border border-orange-200 px-2.5 py-0.5 rounded-full font-bold">
                   2 Águas Sugeridas (180° Opostos)

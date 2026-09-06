@@ -132,8 +132,8 @@ export function StepLocation({ onLocationSelect, currentLocation }: StepLocation
               </span>
               <ProvenanceTooltip
                 title="Coordenadas Geográficas (Lat/Lon)"
-                source="Google Solar API / OpenStreetMap / ViaCEP"
-                formula="Latitude e Longitude resolvidas dinamicamente via webservice gratuito WGS84 para consulta de radiação solar NASA POWER e Google Solar Building Insights."
+                source="PVWatts (NREL) / OpenStreetMap / ViaCEP"
+                formula="Latitude e Longitude resolvidas dinamicamente via webservice gratuito WGS84 para consulta de irradiação solar no modelo PVWatts (NREL / Sandia / Perez Model)."
               />
             </div>
           </div>
