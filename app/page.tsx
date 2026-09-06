@@ -55,8 +55,8 @@ import {
 } from "recharts";
 
 export default function UnifiedSolarSightPage() {
-  // Top 4-Tab Navigation State
-  const [activeTab, setActiveTab] = useState<"tab1" | "tab2" | "tab3" | "tab4">("tab1");
+  // Top 5-Tab Navigation State
+  const [activeTab, setActiveTab] = useState<"tab1" | "tab2" | "tab3" | "tab4" | "tab5">("tab1");
 
   // Tab 1: Wizard Stepper State
   const [currentStep, setCurrentStep] = useState<number>(1);
@@ -221,6 +221,18 @@ export default function UnifiedSolarSightPage() {
             >
               <Cpu className="w-4 h-4" />
               <span>Aba 4: Arquitetura & APIs</span>
+            </button>
+
+            <button
+              onClick={() => setActiveTab("tab5")}
+              className={`py-2.5 px-4 text-xs sm:text-sm font-semibold rounded-t-xl border-b-2 transition flex items-center gap-2 cursor-pointer ${
+                activeTab === "tab5"
+                  ? "border-[#ea580c] text-[#ea580c] bg-orange-50/60 font-bold"
+                  : "border-transparent text-slate-600 hover:text-slate-900"
+              }`}
+            >
+              <BookOpen className="w-4 h-4" />
+              <span>Aba 5: Resumo do Projeto (README)</span>
             </button>
           </nav>
         </div>
@@ -701,6 +713,171 @@ export default function UnifiedSolarSightPage() {
                     </tr>
                   </tbody>
                 </table>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ================= ABA 5: RESUMO DO PROJETO (README GITHUB STYLE) ================= */}
+        {activeTab === "tab5" && (
+          <div className="space-y-6 animate-step-transition max-w-5xl mx-auto font-sans">
+            {/* Header Estilo Repositório GitHub */}
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-orange-50 border border-orange-200 flex items-center justify-center text-[#ea580c]">
+                  <BookOpen className="w-5 h-5 text-[#ea580c]" />
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-slate-500 font-mono">felipe / SolarSight</span>
+                    <span className="text-[10px] bg-slate-100 text-slate-700 border border-slate-300 px-2 py-0.5 rounded-full font-bold">Public Repository</span>
+                  </div>
+                  <h2 className="text-lg font-extrabold text-slate-900 flex items-center gap-2">
+                    README.md — Visão Geral & Documentação de Funcionamento
+                  </h2>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 text-xs font-mono">
+                <span className="bg-slate-100 border border-slate-300 text-slate-700 px-3 py-1 rounded-lg font-bold">
+                  main branch
+                </span>
+                <a
+                  href="https://solarsight-chi.vercel.app"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="bg-[#ea580c] hover:bg-orange-600 text-white px-3.5 py-1.5 rounded-lg font-bold transition flex items-center gap-1.5"
+                >
+                  Ver Deploy na Nuvem &rarr;
+                </a>
+              </div>
+            </div>
+
+            {/* Documentação Markdown Estilo GitHub README */}
+            <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-10 shadow-sm space-y-8 text-slate-800 leading-relaxed text-sm">
+              {/* Título Principal */}
+              <div className="border-b border-slate-200 pb-6 space-y-3">
+                <div className="flex flex-wrap gap-2">
+                  <span className="bg-orange-50 text-[#ea580c] border border-orange-200 text-xs px-2.5 py-1 rounded-md font-bold">TCC FAESA 2026</span>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">Next.js 16 + React 19</span>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">PVWatts (NREL) Model</span>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">Vitória / ES</span>
+                </div>
+                <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
+                  ☀️ SolarSight — Plataforma Preditiva de Geração Fotovoltaica Residencial
+                </h1>
+                <p className="text-slate-600 text-base">
+                  Ferramenta preditiva desenvolvida para dimensionamento fotovoltaico e previsão de geração solar em telhados residenciais de <strong>Vitória - ES</strong>, sem exigir upload de arquivos CSV de inversores.
+                </p>
+              </div>
+
+              {/* Seção 1: Como Funciona */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <Sparkles className="w-5 h-5 text-[#ea580c]" /> 1. Como Funciona o Sistema (Wizard em 4 Passos)
+                </h3>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <span className="font-bold text-[#ea580c]">Passo 1: Geocodificação WGS84</span>
+                    <p className="text-xs text-slate-600">Tradução instantânea de CEP ou endereço em latitude e longitude para a região de Vitória - ES (Lat ~20.31°S).</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <span className="font-bold text-[#ea580c]">Passo 2: Vetorização Satélite Turf.js</span>
+                    <p className="text-xs text-slate-600">Desenho da cobertura em imagem Esri World Imagery com cálculo da área em m² e sugestão geométrica assistida de azimute (Face A / Face B).</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <span className="font-bold text-[#ea580c]">Passo 3: Geometria & Liu-Jordan</span>
+                    <p className="text-xs text-slate-600">Inclinação latitudinal automática (Tilt = 20.3°), fator de transposição incidental (K_trans) e seleção no catálogo de placas Tier-1.</p>
+                  </div>
+                  <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
+                    <span className="font-bold text-[#ea580c]">Passo 4: Diagnóstico 25 Anos & Lei 14.300</span>
+                    <p className="text-xs text-slate-600">Previsão sazonal mensal (PVWatts/NREL + NASA POWER), projeção de 25 anos com degradação (0,5%/ano) e regra tarifária do Fio B EDP ES.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Seção 2: Módulo de Validação */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-[#ea580c]" /> 2. Módulo de Validação Empírica (Evidência Científica)
+                </h3>
+                <p className="text-slate-600 text-xs">
+                  O modelo foi executado e validado estatisticamente contra dados de geração real monitorados em usinas fotovoltaicas de referência no Espírito Santo:
+                </p>
+                <div className="overflow-x-auto bg-slate-50 rounded-xl border border-slate-200 p-2">
+                  <table className="w-full text-left text-xs font-sans">
+                    <thead className="border-b border-slate-200 font-bold text-slate-900 uppercase">
+                      <tr>
+                        <th className="p-3">Usina de Referência</th>
+                        <th className="p-3">Capacidade</th>
+                        <th className="p-3">Geração Real (Ano)</th>
+                        <th className="p-3">Previsão SolarSight</th>
+                        <th className="p-3 text-[#ea580c]">MAPE (Erro %)</th>
+                        <th className="p-3">RMSE (kWh)</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-200">
+                      <tr>
+                        <td className="p-3 font-semibold text-slate-900">Usina FAESA (Vitória/ES)</td>
+                        <td className="p-3">15.4 kWp</td>
+                        <td className="p-3">21.710 kWh</td>
+                        <td className="p-3 font-mono">23.519,2 kWh</td>
+                        <td className="p-3 font-bold text-[#ea580c]">8,51%</td>
+                        <td className="p-3 font-mono">160,6 kWh</td>
+                      </tr>
+                      <tr>
+                        <td className="p-3 font-semibold text-slate-900">Usina GD Comercial (Serra/ES)</td>
+                        <td className="p-3">52.2 kWp</td>
+                        <td className="p-3">73.660 kWh</td>
+                        <td className="p-3 font-mono">78.523,2 kWh</td>
+                        <td className="p-3 font-bold text-[#ea580c]">7,11%</td>
+                        <td className="p-3 font-mono">451,6 kWh</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              {/* Seção 3: Equações e Modelos */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <Calculator className="w-5 h-5 text-[#ea580c]" /> 3. Formulação Matemática Aplicada
+                </h3>
+                <div className="bg-slate-900 text-slate-100 p-4 rounded-xl font-mono text-xs space-y-2 overflow-x-auto">
+                  <p className="text-orange-400 font-bold">// 1. Inclinação Latitudinal Automática (Tilt)</p>
+                  <p className="text-emerald-300">Tilt = |Latitude_Geográfica| ≈ 20.31°S</p>
+                  <p className="text-orange-400 font-bold mt-2">// 2. Irradiância no Plano Inclinado (POA Factor - Liu-Jordan & Erbs)</p>
+                  <p className="text-emerald-300">POA = Direct * Rb + Diffuse * ((1 + cos(Tilt))/2) + Albedo * GHI * ((1 - cos(Tilt))/2)</p>
+                  <p className="text-orange-400 font-bold mt-2">// 3. Performance Ratio Global (PR = 80.0%)</p>
+                  <p className="text-emerald-300">PR = 100% - 14.0% (Térmica/Módulo) - 3.5% (Sujeira/Maresia) - 2.5% (Cabos/CC-CA) = 80.0%</p>
+                </div>
+              </div>
+
+              {/* Seção 4: Stack & Instalação */}
+              <div className="space-y-3">
+                <h3 className="text-xl font-bold text-slate-900 border-b border-slate-100 pb-2 flex items-center gap-2">
+                  <Code2 className="w-5 h-5 text-[#ea580c]" /> 4. Execução Local & Build de Produção
+                </h3>
+                <div className="bg-slate-950 text-slate-200 p-4 rounded-xl font-mono text-xs space-y-1.5">
+                  <p className="text-slate-400"># Clonar e instalar dependências</p>
+                  <p className="text-white">npm install</p>
+                  <p className="text-slate-400 mt-2"># Iniciar servidor de desenvolvimento local</p>
+                  <p className="text-white">npm run dev</p>
+                  <p className="text-slate-400 mt-2"># Compilar pacote otimizado para Vercel</p>
+                  <p className="text-white">npm run build</p>
+                </div>
+              </div>
+
+              {/* Seção 5: Créditos FAESA */}
+              <div className="bg-orange-50/70 p-5 rounded-2xl border border-orange-200 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
+                <div>
+                  <span className="font-bold text-[#ea580c] block text-sm">FAESA — Centro Universitário</span>
+                  <p className="text-slate-700 mt-0.5">Trabalho de Conclusão de Curso em Engenharia da Computação (2026)</p>
+                </div>
+                <div className="text-slate-600 font-semibold text-right">
+                  <p>Autor: Felipe</p>
+                  <p>Vitória - Espírito Santo, Brasil</p>
+                </div>
               </div>
             </div>
           </div>
