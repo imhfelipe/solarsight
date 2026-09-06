@@ -1,0 +1,40 @@
+[
+  {
+    "id": "usina-faesa-vitoria",
+    "name": "Usina Referência FAESA - Vitória/ES",
+    "location": "Vitória, Espírito Santo - Brasil",
+    "latitude": -20.311279122941556,
+    "longitude": -40.31432813971878,
+    "installedCapacityKwp": 15.4,
+    "roofAreaM2": 72.3,
+    "tiltDegrees": 20,
+    "azimuthDegrees": 0,
+    "panelModel": "Canadian Solar HiHero 550Wp",
+    "panelPowerWp": 550,
+    "panelEfficiency": 0.215,
+    "measuredMonthlyKwh": [
+      2150, 2210, 1980, 1720, 1510, 1380, 1430, 1620, 1750, 1890, 1990, 2080
+    ],
+    "measuredAnnualKwh": 21710,
+    "dataSource": "Dados de Geração Distribuída ANEEL / Relatório FAESA 2024"
+  },
+  {
+    "id": "usina-gd-serra",
+    "name": "Usina GD Comercial - Serra/ES",
+    "location": "Serra, Espírito Santo - Brasil",
+    "latitude": -20.1286,
+    "longitude": -40.3078,
+    "installedCapacityKwp": 52.2,
+    "roofAreaM2": 234.0,
+    "tiltDegrees": 20,
+    "azimuthDegrees": 0,
+    "panelModel": "Jinko Solar Tiger Neo 575Wp",
+    "panelPowerWp": 575,
+    "panelEfficiency": 0.222,
+    "measuredMonthlyKwh": [
+      7280, 7490, 6710, 5830, 5120, 4680, 4850, 5490, 5920, 6410, 6750, 7050
+    ],
+    "measuredAnnualKwh": 73660,
+    "dataSource": "Inversor Growatt ShineServer / Registro de Usina GD Registrada ANEEL"
+  }
+]

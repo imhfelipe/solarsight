@@ -1,0 +1,68 @@
+[
+  {
+    "id": "canadian-hihero-550",
+    "brand": "Canadian Solar",
+    "model": "HiHero CS6W-550MS (550Wp)",
+    "powerWp": 550,
+    "efficiency": 0.215,
+    "widthMeters": 1.134,
+    "heightMeters": 2.278,
+    "areaM2": 2.583,
+    "cellTech": "TOPCon N-Type High Efficiency"
+  },
+  {
+    "id": "jinko-tiger-neo-575",
+    "brand": "Jinko Solar",
+    "model": "Tiger Neo N-Type 72HL4-BDVP (575Wp)",
+    "powerWp": 575,
+    "efficiency": 0.222,
+    "widthMeters": 1.134,
+    "heightMeters": 2.278,
+    "areaM2": 2.583,
+    "cellTech": "N-Type TOPCon Bifacial"
+  },
+  {
+    "id": "trina-vertex-n-605",
+    "brand": "Trina Solar",
+    "model": "Vertex N TSM-NEG19RC.20 (605Wp)",
+    "powerWp": 605,
+    "efficiency": 0.224,
+    "widthMeters": 1.134,
+    "heightMeters": 2.384,
+    "areaM2": 2.703,
+    "cellTech": "210mm TOPCon N-Type"
+  },
+  {
+    "id": "longi-hi-mo-6-580",
+    "brand": "LONGi Solar",
+    "model": "Hi-MO 6 Explorer LR5-72HTH-580M (580Wp)",
+    "powerWp": 580,
+    "efficiency": 0.225,
+    "widthMeters": 1.134,
+    "heightMeters": 2.278,
+    "areaM2": 2.583,
+    "cellTech": "HPBC High Efficiency"
+  },
+  {
+    "id": "weg-550-mono",
+    "brand": "WEG",
+    "model": "WEG Solar Monocristalino (550Wp)",
+    "powerWp": 550,
+    "efficiency": 0.213,
+    "widthMeters": 1.134,
+    "heightMeters": 2.278,
+    "areaM2": 2.583,
+    "cellTech": "PERC Monocristalino"
+  },
+  {
+    "id": "risen-titan-500",
+    "brand": "Risen Energy",
+    "model": "Titan RSM150-8-500M (500Wp)",
+    "powerWp": 500,
+    "efficiency": 0.208,
+    "widthMeters": 1.096,
+    "heightMeters": 2.193,
+    "areaM2": 2.403,
+    "cellTech": "PERC 1/3 Cut"
+  }
+]
