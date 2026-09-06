@@ -341,7 +341,7 @@ export default function UnifiedSolarSightPage() {
             {/* Banner do Módulo de Validação */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-orange-200 shadow-sm space-y-3">
               <span className="text-xs font-bold font-sans px-3 py-1 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 uppercase tracking-wider">
-                MÓDULO DE EVIDÊNCIA CIENTÍFICA (TCC FAESA & GOOGLE SOLAR API)
+                MÓDULO DE EVIDÊNCIA CIENTÍFICA (TCC FAESA & MODELO PVWATTS NREL)
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
                 <Award className="w-7 h-7 text-[#ea580c]" />
