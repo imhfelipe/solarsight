@@ -14,7 +14,7 @@ export const TCC_TITLE = "SolarSight: Previsão de Geração & Diagnóstico Foto
 
 // Limiares de Diagnóstico
 export const NORMAL_DEVIATION_THRESHOLD = 0.05; // 5% tolerância operacional (IEC 61724)
-export const SOILING_LOSS_THRESHOLD = 0.11; // 11% perda sustentada por sujidade/maresia
+export const SOILING_LOSS_THRESHOLD = 0.035; // 3.5% perda por sujidade/maresia em ambiente costeiro
 export const CLOUDINESS_CUTOFF_RATIO = 0.40; // 40% da irradiação mediana (filtro de nebulosidade)
 export const SHADING_RECURRENCE_MIN_DAYS = 3; // Mínimo de 3 dias com queda pontual para sombreamento fixo
 export const SHADING_DROP_THRESHOLD = 0.25; // 25% de queda horária abrupta

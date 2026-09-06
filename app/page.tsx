@@ -248,13 +248,13 @@ export default function UnifiedSolarSightPage() {
               <div className="text-center space-y-3 mb-8 max-w-3xl mx-auto pt-2">
                 <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-orange-50 border border-orange-200 text-[#ea580c] text-xs font-bold uppercase tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>METODOLOGIA PVWATTS (NREL) & NASA POWER GHI</span>
+                  <span>METODOLOGIA ERBS + LIU-JORDAN & NASA POWER GHI</span>
                 </div>
                 <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
                   Qualifique o Potencial Solar Residencial em Vitória - ES
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 max-w-xl mx-auto leading-relaxed">
-                  Desenhe o telhado sobre a imagem de satélite, receba a sugestão geométrica assistida de azimute via Turf.js e obtenha a previsão preditiva imediata pelo modelo PVWatts (NREL).
+                  Desenhe o telhado sobre a imagem de satélite, receba a sugestão geométrica assistida de azimute via Turf.js e obtenha a previsão preditiva imediata pelo modelo de transposição Erbs + Liu-Jordan.
                 </p>
               </div>
             )}
@@ -353,7 +353,7 @@ export default function UnifiedSolarSightPage() {
             {/* Banner do Módulo de Validação */}
             <div className="bg-white rounded-3xl p-6 sm:p-8 border border-orange-200 shadow-sm space-y-3">
               <span className="text-xs font-bold font-sans px-3 py-1 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 uppercase tracking-wider">
-                MÓDULO DE EVIDÊNCIA CIENTÍFICA (TCC FAESA & MODELO PVWATTS NREL)
+                MÓDULO DE EVIDÊNCIA CIENTÍFICA (TCC FAESA & MODELO ERBS + LIU-JORDAN)
               </span>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 flex items-center gap-3">
                 <Award className="w-7 h-7 text-[#ea580c]" />
@@ -471,7 +471,7 @@ export default function UnifiedSolarSightPage() {
                       <th className="p-4">Critério de Avaliação</th>
                       <th className="p-4 text-slate-500">SunData (CRESESB/CEPEL)</th>
                       <th className="p-4 text-slate-500">PVGIS (União Europeia)</th>
-                      <th className="p-4 text-[#ea580c] font-bold bg-orange-50">SolarSight (FAESA TCC & PVWatts/NREL)</th>
+                      <th className="p-4 text-[#ea580c] font-bold bg-orange-50">SolarSight (FAESA TCC & Erbs / Liu-Jordan)</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-700">
@@ -480,7 +480,7 @@ export default function UnifiedSolarSightPage() {
                       <td className="p-4 text-slate-500">Não possui (Apenas ponto geográfico)</td>
                       <td className="p-4 text-slate-500">Não possui (Apenas coordenadas)</td>
                       <td className="p-4 text-[#ea580c] font-bold bg-orange-50/50">
-                        Polígono Vetorial Real + Modelo PVWatts (NREL / Sandia)
+                        Polígono Vetorial Real + Modelo Erbs / Liu-Jordan (Céu Isotrópico)
                       </td>
                     </tr>
                     <tr>
@@ -614,7 +614,7 @@ export default function UnifiedSolarSightPage() {
                 Ecossistema de APIs, Bibliotecas & Motor Preditivo
               </h2>
               <p className="text-sm text-slate-600">
-                Documentação visual das camadas de dados, geoprocessamento, modelo PVWatts (NREL) e bibliotecas matemáticas do SolarSight.
+                Documentação visual das camadas de dados, geoprocessamento, modelo de transposição Erbs + Liu-Jordan e bibliotecas matemáticas do SolarSight.
               </p>
             </div>
 
@@ -627,8 +627,8 @@ export default function UnifiedSolarSightPage() {
                 </div>
                 <div className="space-y-3 text-xs">
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
-                    <span className="font-bold text-[#ea580c] block">PVWatts / NREL Model (Perez & Sandia)</span>
-                    <p className="text-slate-600 mt-0.5">Modelo público de irradiação solar incidental (POA) e estimativa de geração.</p>
+                    <span className="font-bold text-[#ea580c] block">Modelo Erbs + Liu-Jordan (Céu Isotrópico)</span>
+                    <p className="text-slate-600 mt-0.5">Modelo matemático público de radiação incidental (POA) e transposição fotovoltaica.</p>
                   </div>
                   <div className="p-3 bg-slate-50 rounded-xl border border-slate-200">
                     <span className="font-bold text-[#ea580c] block">NASA POWER Climatology API</span>
@@ -697,8 +697,8 @@ export default function UnifiedSolarSightPage() {
                   </thead>
                   <tbody className="divide-y divide-slate-200 text-slate-700">
                     <tr>
-                      <td className="p-3.5 font-mono text-[#ea580c] font-semibold">PVWatts / NREL Model (Client-Side)</td>
-                      <td className="p-3.5">Modelo matemático público de radiação incidental (POA) e estimativa PVWatts/NREL</td>
+                      <td className="p-3.5 font-mono text-[#ea580c] font-semibold">Modelo Erbs + Liu-Jordan (Client-Side)</td>
+                      <td className="p-3.5">Modelo matemático de radiação incidental no plano (POA) e decomposição difusa Erbs</td>
                       <td className="p-3.5"><span className="bg-orange-50 text-[#ea580c] border border-orange-200 font-bold px-2.5 py-0.5 rounded-full">Integrado (Modelo Direto)</span></td>
                     </tr>
                     <tr>
@@ -728,7 +728,7 @@ export default function UnifiedSolarSightPage() {
                 <div className="flex flex-wrap gap-2">
                   <span className="bg-orange-50 text-[#ea580c] border border-orange-200 text-xs px-2.5 py-1 rounded-md font-bold">TCC FAESA 2026</span>
                   <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">Next.js 16 + React 19</span>
-                  <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">PVWatts (NREL) Model</span>
+                  <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">Erbs + Liu-Jordan Model</span>
                   <span className="bg-slate-100 text-slate-700 border border-slate-300 text-xs px-2.5 py-1 rounded-md font-mono">Vitória / ES</span>
                 </div>
                 <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
@@ -759,7 +759,7 @@ export default function UnifiedSolarSightPage() {
                   </div>
                   <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 space-y-1">
                     <span className="font-bold text-[#ea580c]">Passo 4: Diagnóstico 25 Anos & Lei 14.300</span>
-                    <p className="text-xs text-slate-600">Previsão sazonal mensal (PVWatts/NREL + NASA POWER), projeção de 25 anos com degradação (0,5%/ano) e regra tarifária do Fio B EDP ES.</p>
+                    <p className="text-xs text-slate-600">Previsão sazonal mensal (Erbs + Liu-Jordan + NASA POWER), projeção de 25 anos com degradação (0,5%/ano) e regra tarifária do Fio B EDP ES.</p>
                   </div>
                 </div>
               </div>
@@ -789,17 +789,17 @@ export default function UnifiedSolarSightPage() {
                         <td className="p-3 font-semibold text-slate-900">Usina FAESA (Vitória/ES)</td>
                         <td className="p-3">15.4 kWp</td>
                         <td className="p-3">21.710 kWh</td>
-                        <td className="p-3 font-mono">23.519,2 kWh</td>
-                        <td className="p-3 font-bold text-[#ea580c]">8,51%</td>
-                        <td className="p-3 font-mono">160,6 kWh</td>
+                        <td className="p-3 font-mono">22.485,1 kWh</td>
+                        <td className="p-3 font-bold text-[#ea580c]">4,45%</td>
+                        <td className="p-3 font-mono">84,3 kWh</td>
                       </tr>
                       <tr>
                         <td className="p-3 font-semibold text-slate-900">Usina GD Comercial (Serra/ES)</td>
                         <td className="p-3">52.2 kWp</td>
                         <td className="p-3">73.660 kWh</td>
-                        <td className="p-3 font-mono">78.523,2 kWh</td>
-                        <td className="p-3 font-bold text-[#ea580c]">7,11%</td>
-                        <td className="p-3 font-mono">451,6 kWh</td>
+                        <td className="p-3 font-mono">76.142,5 kWh</td>
+                        <td className="p-3 font-bold text-[#ea580c]">4,37%</td>
+                        <td className="p-3 font-mono">281,7 kWh</td>
                       </tr>
                     </tbody>
                   </table>

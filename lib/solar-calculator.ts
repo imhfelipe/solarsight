@@ -24,9 +24,9 @@ export interface MonthlyForecastPoint {
   monthIndex: number; // 0..11
   dailyGhiKwhM2: number;
   poaIrradianceKwhM2: number;
-  idealMonthlyGenKwh: number;
-  soilingMonthlyGenKwh: number;
-  estimatedSavingsBrl: number;
+  idealMonthlyGenKwh: number; // Geração sem perdas de sujeira (ideal para comparação)
+  soilingMonthlyGenKwh: number; // Geração líquida estimada (com perda de sujidade/maresia)
+  estimatedSavingsBrl: number; // Economia líquida baseada na geração real com sujeira
 }
 
 export interface YearProjectionPoint {
@@ -59,7 +59,8 @@ export interface FutureSolarPredictionResult {
   monthlyForecast: MonthlyForecastPoint[];
   yearlyProjections: YearProjectionPoint[];
   estimatedSoilingLossPercent: number;
-  nrelPVWattsSource: string;
+  transpositionModelSource: string;
+  nrelPVWattsSource: string; // Mantido para compatibilidade retroativa
 }
 
 export interface ValidationSystemResult {
@@ -103,9 +104,19 @@ export function calculateCoordinateTilt(latitude: number): number {
 }
 
 /**
- * Modelo Rigoroso de Transposição Solar Liu-Jordan & Erbs para cálculo do POA (Plane of Array)
+ * Modelo de Transposição Solar: Erbs (fração difusa) + Liu-Jordan (céu isotrópico)
  * Decompõe a irradiação Global Horizontal (GHI) em componente Direta (DNI) e Difusa (DHI)
  * via correlação empírica de Erbs, aplicando o modelo de céu isotrópico de Liu-Jordan.
+ * 
+ * PREMISSAS E LIMITAÇÕES ASSUMIDAS DO MODELO:
+ * 1. Coeficiente de Limpidez Kt Fixo (0,58): O índice Kt real varia sazonalmente entre a
+ *    estação chuvosa e seca em Vitória/ES. Usar o valor médio anual de 0,58 é uma simplificação
+ *    assumida para evitar requisição extra de dados diários de nebulosidade.
+ * 2. Transposição Estática Anual (transFactor): O fator transFactor é calculado uma única vez
+ *    fora do loop mensal. A sazonalidade da previsão decorre primariamente da curva de GHI mensal.
+ * 3. Componente Direta Rb ao Meio-Dia Solar: O fator Rb utiliza a aproximação simplificada do
+ *    ângulo de incidência solar ao meio-dia (cos(lat - tilt) * cos(azimute) / cos(lat)), operando
+ *    como uma heurística direcional consistente sem exigir integração horária de Klein & Duffie.
  */
 export function calculateLiuJordanTranspositionFactor(
   latitude: number,
@@ -117,7 +128,7 @@ export function calculateLiuJordanTranspositionFactor(
   const latRad = (absLat * Math.PI) / 180;
   const azimRad = (azimuthDegrees * Math.PI) / 180;
 
-  // 1. Coeficiente de transmissão atmosférica K_T (Índice de Limpidez de Erbs para Vitória/ES ~0.58)
+  // 1. Coeficiente de transmissão atmosférica K_T (Índice de Limpidez Médio de Erbs para Vitória/ES ~0,58)
   const Kt = 0.58;
 
   // 2. Fração Difusa de Erbs (H_d / H)
@@ -125,13 +136,12 @@ export function calculateLiuJordanTranspositionFactor(
   const diffuseFraction = 1.391 - 3.56 * Kt + 4.189 * Math.pow(Kt, 2) - 2.137 * Math.pow(Kt, 3);
   const clampedDiffuseFraction = Math.max(0.18, Math.min(0.82, diffuseFraction));
 
-  // 3. Fator R_b de componente direta no plano inclinado
+  // 3. Fator R_b de componente direta no plano inclinado (Aproximação de incidência solar ao meio-dia)
   const cosIncidenceAngle = Math.cos(latRad - tiltRad) * Math.cos(azimRad);
   const cosZenithAngle = Math.cos(latRad);
   const Rb = Math.max(0.5, Math.min(1.4, cosIncidenceAngle / (cosZenithAngle || 0.001)));
 
   // 4. Modelo de Céu Isotrópico de Liu-Jordan para Irradiação Incidental no Plano (POA)
-  // POA = Direct * Rb + Diffuse * ((1 + cos(tilt))/2) + GroundReflected * albedo * ((1 - cos(tilt))/2)
   const albedo = 0.20; // Albedo padrão do solo/telhado
   const directWeight = (1 - clampedDiffuseFraction) * Rb;
   const diffuseWeight = clampedDiffuseFraction * ((1 + Math.cos(tiltRad)) / 2);
@@ -187,23 +197,30 @@ export function runFutureSolarPrediction(
   const calculatedTiltDegrees = calculateCoordinateTilt(latitude);
   const transFactor = calculateLiuJordanTranspositionFactor(latitude, calculatedTiltDegrees, azimuthDegrees);
 
+  // BUG #1 FIX: Derivar capacidade instalada real a partir do número inteiro de módulos no telhado
   const estimatedModuleCount = Math.max(1, Math.floor((roofAreaM2 * 0.85) / panel.areaM2));
   const installedCapacityKwp = Number(((estimatedModuleCount * panel.powerWp) / 1000).toFixed(2));
 
   const daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
   let firstYearGenKwh = 0;
 
+  const currentYear = new Date().getFullYear();
+  const netTariffYear1 = calculateNetTariffLei14300(currentYear, baseTariffBrl);
+
   const monthlyForecast: MonthlyForecastPoint[] = VITORIA_MONTHLY_GHI_KWH_M2.map((ghi, idx) => {
     const poa = ghi * transFactor;
-    const idealGen = poa * roofAreaM2 * panel.efficiency * performanceRatio * daysInMonths[idx];
+    
+    // BUG #1 FIX: Energia mensal ideal (bruta) derivada diretamente do kWp instalado (E = kWp * POA * PR * dias)
+    const idealGen = installedCapacityKwp * poa * performanceRatio * daysInMonths[idx];
+    
+    // BUG #2 FIX: Geração líquida real (aplicando o fator de sujidade/maresia)
     const soilingGen = idealGen * (1 - SOILING_LOSS_THRESHOLD);
 
-    // Tarifa do 1º ano com Lei 14.300
-    const currentYear = new Date().getFullYear();
-    const netTariffYear1 = calculateNetTariffLei14300(currentYear, baseTariffBrl);
-    const savings = idealGen * netTariffYear1;
+    // BUG #2 FIX: Economia financeira calculada sobre a geração líquida real
+    const savings = soilingGen * netTariffYear1;
 
-    firstYearGenKwh += idealGen;
+    // BUG #2 FIX: Acumular a geração líquida real para os totais anuais
+    firstYearGenKwh += soilingGen;
 
     return {
       monthName: MONTH_NAMES_PT[idx],
@@ -216,11 +233,10 @@ export function runFutureSolarPrediction(
     };
   });
 
-  const currentYear = new Date().getFullYear();
-  const netTariffYear1 = calculateNetTariffLei14300(currentYear, baseTariffBrl);
+  // BUG #2 FIX: Economia do primeiro ano derivada da geração líquida com sujeira
   const firstYearSavingsBrl = Number((firstYearGenKwh * netTariffYear1).toFixed(2));
 
-  // Projeção de 25 Anos com Degradação de Fábrica (0.5%/ano) + Regra da Lei 14.300
+  // Projeção de 25 Anos com Degradação de Fábrica (0.5%/ano) + Regra da Lei 14.300 sobre Geração Líquida
   const yearlyProjections: YearProjectionPoint[] = [];
   let cumKwh = 0;
   let cumSavings = 0;
@@ -253,6 +269,8 @@ export function runFutureSolarPrediction(
   const totalSystemCost = installedCapacityKwp * estimatedSystemCostPerKwp;
   const paybackYears = Number((totalSystemCost / (firstYearSavingsBrl || 1)).toFixed(1));
 
+  const modelSourceText = "Modelo de Transposição Erbs (fração difusa) + Liu-Jordan (céu isotrópico) + NASA POWER Climatology";
+
   return {
     latitude,
     longitude,
@@ -270,8 +288,10 @@ export function runFutureSolarPrediction(
     estimatedPaybackYears: paybackYears,
     monthlyForecast,
     yearlyProjections,
-    estimatedSoilingLossPercent: 3.5,
-    nrelPVWattsSource: "Modelo Preditivo PVWatts (NREL / Sandia / Perez Model) + NASA POWER Climatology",
+    // BUG #2 FIX: Ler dinamicamente a constante SOILING_LOSS_THRESHOLD
+    estimatedSoilingLossPercent: Number((SOILING_LOSS_THRESHOLD * 100).toFixed(1)),
+    transpositionModelSource: modelSourceText,
+    nrelPVWattsSource: modelSourceText,
   };
 }
 
@@ -310,19 +330,24 @@ export function runValidationAnalysis(): ValidationSystemResult[] {
       cellTech: "Monocristalino PERC/TOPCon",
     };
 
-    const simResult = runFutureSolarPrediction(
-      sys.roofAreaM2,
-      dummyPanel,
-      sys.latitude,
-      sys.longitude,
-      sys.azimuthDegrees
-    );
+    const calculatedTiltDegrees = calculateCoordinateTilt(sys.latitude);
+    const transFactor = calculateLiuJordanTranspositionFactor(sys.latitude, calculatedTiltDegrees, sys.azimuthDegrees);
+    const daysInMonths = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 
     let absolutePercentageErrorSum = 0;
     let squaredErrorSum = 0;
+    let totalSimulatedAnnualKwh = 0;
 
     const monthlyComparison = sys.measuredMonthlyKwh.map((measured, idx) => {
-      const simulated = simResult.monthlyForecast[idx].idealMonthlyGenKwh;
+      const ghi = VITORIA_MONTHLY_GHI_KWH_M2[idx];
+      const poa = ghi * transFactor;
+      
+      // Simulação usando a capacidade instalada real da usina de referência
+      const idealGen = sys.installedCapacityKwp * poa * DEFAULT_PERFORMANCE_RATIO * daysInMonths[idx];
+      const simulated = idealGen * (1 - SOILING_LOSS_THRESHOLD);
+
+      totalSimulatedAnnualKwh += simulated;
+
       const absErr = Math.abs(measured - simulated);
       const errPct = (absErr / (measured || 1)) * 100;
 
@@ -332,7 +357,7 @@ export function runValidationAnalysis(): ValidationSystemResult[] {
       return {
         monthName: MONTH_NAMES_PT[idx],
         measuredKwh: measured,
-        simulatedKwh: simulated,
+        simulatedKwh: Number(simulated.toFixed(1)),
         errorPercent: Number(errPct.toFixed(2)),
       };
     });
@@ -346,7 +371,7 @@ export function runValidationAnalysis(): ValidationSystemResult[] {
       location: sys.location,
       installedCapacityKwp: sys.installedCapacityKwp,
       measuredAnnualKwh: sys.measuredAnnualKwh,
-      simulatedAnnualKwh: simResult.firstYearGenerationKwh,
+      simulatedAnnualKwh: Number(totalSimulatedAnnualKwh.toFixed(1)),
       mapePercent: mape,
       rmseKwh: rmse,
       monthlyComparison,

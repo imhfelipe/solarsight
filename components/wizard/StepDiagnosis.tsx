@@ -59,7 +59,7 @@ export function StepDiagnosis({
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto pb-12 print:p-0 font-sans">
-      {/* Banner Principal de Previsão Futura Estilo PVWatts NREL Executive Summary */}
+      {/* Banner Principal de Previsão Futura Estilo Erbs & Liu-Jordan Executive Summary */}
       <div className="bg-gradient-to-r from-orange-500 via-[#ea580c] to-amber-600 rounded-3xl p-6 sm:p-8 text-white shadow-lg relative overflow-hidden">
         <div className="flex flex-col sm:flex-row items-start justify-between gap-6 z-10 relative">
           <div className="space-y-3 max-w-2xl">
@@ -69,17 +69,17 @@ export function StepDiagnosis({
               </span>
               <span className="text-xs text-orange-100 font-sans flex items-center gap-1">
                 <MapPin className="w-3.5 h-3.5 text-amber-200" /> Tilt {prediction.calculatedTiltDegrees}° / Azimute {prediction.azimuthDegrees}°
-                <ProvenanceTooltip sourceText="Inclinação calculada pela latitude geográfica local e azimute assistido via Turf.js no modelo PVWatts (NREL)." />
+                <ProvenanceTooltip sourceText="Inclinação calculada pela latitude geográfica local e azimute assistido via Turf.js no modelo Erbs + Liu-Jordan." />
               </span>
             </div>
 
             <h2 className="text-3xl font-extrabold text-white tracking-tight flex items-center gap-3">
               <Sparkles className="w-8 h-8 text-amber-200" />
-              Previsão de Geração Solar Preditiva (PVWatts / NREL)
+              Previsão de Geração Solar Preditiva (Erbs + Liu-Jordan)
             </h2>
 
             <p className="text-xs sm:text-sm text-orange-50 leading-relaxed">
-              Estimativa preditiva de produção de energia futura calculada com base na irradiação solar incidental (POA) pelo modelo Liu-Jordan & Erbs + PVWatts (NREL / Sandia / Perez Model), inclinada dinamicamente conforme a latitude e escalonada pela placa solar ({panel.brand} {panel.powerWp}Wp).
+              Estimativa preditiva de produção de energia futura calculada com base na irradiação solar incidental (POA) pelo modelo Erbs (fração difusa) + Liu-Jordan (céu isotrópico) + NASA POWER Climatology, inclinada dinamicamente conforme a latitude e escalonada pela capacidade fotovoltaica ({prediction.installedCapacityKwp} kWp - {panel.brand} {panel.powerWp}Wp).
             </p>
 
             <div className="bg-black/20 backdrop-blur-md p-4 rounded-xl border border-white/20 text-xs text-white space-y-1">
@@ -87,7 +87,7 @@ export function StepDiagnosis({
                 <span className="font-bold text-amber-200 uppercase tracking-wider">
                   Resumo da Estimativa Preditiva:
                 </span>
-                <ProvenanceTooltip sourceText="Calculado via irradiação no plano (POA), modelo PVWatts (NREL), eficiência nominal do painel e PR fixo de 80% (incluindo 3,5% de sujeira/maresia)." />
+                <ProvenanceTooltip sourceText="Calculado via irradiação no plano (POA), modelo Erbs + Liu-Jordan, eficiência nominal do painel e PR de 80% com 3,5% de sujeira/maresia." />
               </div>
               <p>
                 O gerador fotovoltaico de <strong>{prediction.installedCapacityKwp} kWp</strong> ({prediction.estimatedModuleCount} placas) prevê produzir <strong><AnimatedNumber value={prediction.firstYearGenerationKwh} decimals={0} suffix=" kWh" /></strong> no 1º ano de operação na região de {location.city}/{location.state}.
@@ -101,7 +101,7 @@ export function StepDiagnosis({
               <span className="text-xs text-slate-500 uppercase tracking-wider font-bold">
                 Geração Preditiva (1º Ano)
               </span>
-              <ProvenanceTooltip sourceText="Fonte: NASA POWER & Modelo PVWatts (NREL / Sandia / Perez Model)" />
+              <ProvenanceTooltip sourceText="Fonte: NASA POWER & Modelo de Transposição Erbs + Liu-Jordan (Céu Isotrópico)" />
             </div>
 
             <div className="flex items-baseline gap-2">
