@@ -351,7 +351,7 @@ export function StepDiagnosis({
                 Comparação entre a geração futura limpa vs. geração com acúmulo médio estimado de sujidade ({prediction.estimatedSoilingLossPercent}%).
               </p>
             </div>
-            <ProvenanceTooltip sourceText="Perda de sujidade de 11% estimada conforme estudos acadêmicos em ambiente costeiro com maresia na Grande Vitória/ES." />
+            <ProvenanceTooltip sourceText="Perda por sujidade/maresia de 3,5% integrada ao Performance Ratio global de 80% conforme normas técnicas para a região litorânea da Grande Vitória/ES." />
           </div>
 
           <div className="h-80 w-full pt-4">
@@ -366,7 +366,7 @@ export function StepDiagnosis({
                 />
                 <Legend wrapperStyle={{ fontSize: "12px", paddingTop: "10px" }} />
                 <Line type="monotone" dataKey="idealMonthlyGenKwh" name="Geração Futura Ideal (kWh)" stroke="#06b6d4" strokeWidth={2.5} />
-                <Line type="monotone" dataKey="soilingMonthlyGenKwh" name="Geração Futura com Sujeira (~11% perda)" stroke="#f59e0b" strokeWidth={2.5} strokeDasharray="4 4" />
+                <Line type="monotone" dataKey="soilingMonthlyGenKwh" name="Geração Futura com Sujeira (~3,5% perda)" stroke="#f59e0b" strokeWidth={2.5} strokeDasharray="4 4" />
               </ComposedChart>
             </ResponsiveContainer>
           </div>

@@ -165,9 +165,9 @@ export default function UnifiedSolarSightPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex items-center gap-2 text-xs text-slate-700 bg-slate-100 border border-slate-200 px-3.5 py-1.5 rounded-xl font-medium">
+            <div className="hidden md:flex items-center gap-2 text-xs text-slate-700 bg-orange-50 border border-orange-200 px-3.5 py-1.5 rounded-xl font-bold text-[#ea580c]">
               <Shield className="w-4 h-4 text-[#ea580c]" />
-              <span>Stateless (Zero-Token)</span>
+              <span>Dimensionamento Residencial</span>
             </div>
           </div>
         </div>
@@ -687,7 +687,7 @@ export default function UnifiedSolarSightPage() {
                     <tr>
                       <td className="p-3.5 font-mono text-[#ea580c] font-semibold">PVWatts / NREL Model (Client-Side)</td>
                       <td className="p-3.5">Modelo matemático público de radiação incidental (POA) e estimativa PVWatts/NREL</td>
-                      <td className="p-3.5"><span className="bg-orange-50 text-[#ea580c] border border-orange-200 font-bold px-2.5 py-0.5 rounded-full">Integrado (Zero-Token)</span></td>
+                      <td className="p-3.5"><span className="bg-orange-50 text-[#ea580c] border border-orange-200 font-bold px-2.5 py-0.5 rounded-full">Integrado (Modelo Direto)</span></td>
                     </tr>
                     <tr>
                       <td className="p-3.5 font-mono text-[#ea580c] font-semibold">https://power.larc.nasa.gov/api</td>
