@@ -7,13 +7,20 @@ import "leaflet-draw/dist/leaflet.draw.css";
 import "leaflet-draw";
 import * as turf from "@turf/turf";
 import { GeocodingResult } from "@/lib/geocoding";
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, Loader2, Sparkles, Compass } from "lucide-react";
+import {
+  analyzeRoofImageRidge,
+  RidgeDetectionResult,
+} from "@/lib/roof-image-analysis";
 
 interface LeafletRoofMapProps {
   location: GeocodingResult;
   initialAreaM2?: number;
   onAreaConfirmed: (areaM2: number) => void;
-  onAzimuthCandidatesSuggested?: (candidates: [number, number]) => void;
+  onAzimuthCandidatesSuggested?: (
+    candidates: [number, number],
+    detectionResult?: RidgeDetectionResult
+  ) => void;
 }
 
 export function LeafletRoofMap({
@@ -25,8 +32,11 @@ export function LeafletRoofMap({
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapInstanceRef = useRef<L.Map | null>(null);
   const featureGroupRef = useRef<L.FeatureGroup | null>(null);
+  const ridgeLayerRef = useRef<L.Polyline | null>(null);
 
   const [areaM2, setAreaM2] = useState<number>(initialAreaM2 || 0);
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const [detectionResult, setDetectionResult] = useState<RidgeDetectionResult | null>(null);
 
   useEffect(() => {
     if (!mapContainerRef.current) return;
@@ -49,11 +59,14 @@ export function LeafletRoofMap({
       zoomControl: true,
     });
 
+    // Option `crossOrigin: true` enables client-side canvas cropping without tainted canvas issues
     const esriSat = L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {
         maxZoom: 19,
-        attribution: "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
+        crossOrigin: true,
+        attribution:
+          "Tiles &copy; Esri &mdash; Source: Esri, i-cubed, USDA, USGS, AEX, GeoEye, Getmapping, Aerogrid, IGN, IGP, UPR-EGP, and the GIS User Community",
       }
     );
 
@@ -64,7 +77,12 @@ export function LeafletRoofMap({
 
     esriSat.addTo(map);
 
-    L.control.layers({ "Satélite (Esri World Imagery)": esriSat, "Ruas (OpenStreetMap)": osmRoads }).addTo(map);
+    L.control
+      .layers({
+        "Satélite (Esri World Imagery)": esriSat,
+        "Ruas (OpenStreetMap)": osmRoads,
+      })
+      .addTo(map);
 
     L.marker([location.lat, location.lon])
       .addTo(map)
@@ -100,46 +118,72 @@ export function LeafletRoofMap({
 
     map.addControl(drawControl);
 
-    // Eventos de cálculo de área com Turf.js e rumo da aresta mais longa para sugestão de azimute
-    const calculateLayerMetrics = () => {
+    const processRoofAnalysis = async () => {
       let totalArea = 0;
-      let longestEdgeMaxLen = 0;
-      let longestEdgePts: [turf.Coord, turf.Coord] | null = null;
+      let targetPolygonLayer: L.Polygon | null = null;
 
       drawnItems.eachLayer((layer: unknown) => {
         const l = layer as L.Polygon;
         const geoJson = l.toGeoJSON() as GeoJSON.Feature<GeoJSON.Polygon>;
         totalArea += turf.area(geoJson);
-
-        // Identificar aresta mais longa
-        const coords = geoJson.geometry.coordinates[0];
-        if (coords && coords.length >= 3) {
-          for (let i = 0; i < coords.length - 1; i++) {
-            const p1 = turf.point(coords[i]);
-            const p2 = turf.point(coords[i + 1]);
-            const dist = turf.distance(p1, p2, { units: "meters" });
-            if (dist > longestEdgeMaxLen) {
-              longestEdgeMaxLen = dist;
-              longestEdgePts = [coords[i], coords[i + 1]];
-            }
-          }
-        }
+        targetPolygonLayer = l;
       });
 
       const roundedArea = Number(totalArea.toFixed(1));
       setAreaM2(roundedArea);
       onAreaConfirmed(roundedArea);
 
-      // Calcular azimute sugerido se encontrou aresta mais longa
-      if (longestEdgePts && onAzimuthCandidatesSuggested) {
-        const pointA = turf.point(longestEdgePts[0]);
-        const pointB = turf.point(longestEdgePts[1]);
-        const edgeBearing = turf.bearing(pointA, pointB);
+      // Remove existing ridge line from map if present
+      if (ridgeLayerRef.current) {
+        map.removeLayer(ridgeLayerRef.current);
+        ridgeLayerRef.current = null;
+      }
 
-        const azim1 = Math.round((edgeBearing + 90 + 360) % 360);
-        const azim2 = Math.round((edgeBearing - 90 + 360) % 360);
+      if (!targetPolygonLayer || roundedArea <= 0) {
+        setDetectionResult(null);
+        return;
+      }
 
-        onAzimuthCandidatesSuggested([azim1, azim2]);
+      setIsAnalyzing(true);
+
+      // Short delay to allow Leaflet tile rendering
+      await new Promise((resolve) => setTimeout(resolve, 150));
+
+      try {
+        const result = await analyzeRoofImageRidge(map, targetPolygonLayer);
+        setDetectionResult(result);
+
+        // Draw detected ridge line on map
+        if (result.ridgeLinePoints && mapInstanceRef.current) {
+          const lineLatLngs: [number, number][] = [
+            [result.ridgeLinePoints[0].lat, result.ridgeLinePoints[0].lng],
+            [result.ridgeLinePoints[1].lat, result.ridgeLinePoints[1].lng],
+          ];
+
+          const ridgePolyline = L.polyline(lineLatLngs, {
+            color: result.method === "image" ? "#ea580c" : "#06b6d4",
+            weight: 4,
+            dashArray: result.method === "image" ? "6, 6" : "3, 3",
+            opacity: 0.95,
+          }).addTo(mapInstanceRef.current);
+
+          ridgePolyline.bindTooltip(
+            result.method === "image"
+              ? "Cumeeira detectada por análise de imagem (OpenCV.js)"
+              : "Linha de cumeeira sugerida (Aresta geométrica)",
+            { permanent: false, direction: "top" }
+          );
+
+          ridgeLayerRef.current = ridgePolyline;
+        }
+
+        if (onAzimuthCandidatesSuggested) {
+          onAzimuthCandidatesSuggested(result.candidateAzimuths, result);
+        }
+      } catch (err) {
+        console.error("Erro na análise de imagem do telhado:", err);
+      } finally {
+        setIsAnalyzing(false);
       }
     };
 
@@ -147,11 +191,19 @@ export function LeafletRoofMap({
       const event = e as { layer: L.Layer };
       drawnItems.clearLayers();
       drawnItems.addLayer(event.layer);
-      calculateLayerMetrics();
+      processRoofAnalysis();
     });
 
-    map.on(L.Draw.Event.EDITED, calculateLayerMetrics);
-    map.on(L.Draw.Event.DELETED, calculateLayerMetrics);
+    map.on(L.Draw.Event.EDITED, processRoofAnalysis);
+    map.on(L.Draw.Event.DELETED, () => {
+      if (ridgeLayerRef.current && mapInstanceRef.current) {
+        mapInstanceRef.current.removeLayer(ridgeLayerRef.current);
+        ridgeLayerRef.current = null;
+      }
+      setAreaM2(0);
+      onAreaConfirmed(0);
+      setDetectionResult(null);
+    });
 
     mapInstanceRef.current = map;
 
@@ -166,15 +218,48 @@ export function LeafletRoofMap({
   const handleReset = () => {
     if (featureGroupRef.current) {
       featureGroupRef.current.clearLayers();
-      setAreaM2(0);
-      onAreaConfirmed(0);
     }
+    if (ridgeLayerRef.current && mapInstanceRef.current) {
+      mapInstanceRef.current.removeLayer(ridgeLayerRef.current);
+      ridgeLayerRef.current = null;
+    }
+    setAreaM2(0);
+    onAreaConfirmed(0);
+    setDetectionResult(null);
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 font-sans">
       <div className="relative rounded-2xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-950 h-[480px]">
         <div ref={mapContainerRef} className="w-full h-full z-0" />
+
+        {/* Floating Non-Blocking Loading Indicator */}
+        {isAnalyzing && (
+          <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-slate-900/95 text-white backdrop-blur-md border border-orange-500/50 px-4 py-2 rounded-full shadow-2xl flex items-center gap-2.5 text-xs font-semibold z-[1000] animate-pulse">
+            <Loader2 className="w-4 h-4 animate-spin text-[#ea580c]" />
+            <span>Analisando orientação do telhado... (OpenCV.js WASM)</span>
+          </div>
+        )}
+
+        {/* Provenance badge overlay when analysis completes */}
+        {detectionResult && !isAnalyzing && (
+          <div className="absolute top-4 left-4 z-[1000] max-w-sm">
+            <div
+              className={`px-3 py-1.5 rounded-xl border backdrop-blur-md text-[11px] font-bold shadow-lg flex items-center gap-2 ${
+                detectionResult.method === "image"
+                  ? "bg-slate-900/90 text-orange-400 border-orange-500/40"
+                  : "bg-slate-900/90 text-cyan-400 border-cyan-500/40"
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5 shrink-0" />
+              <span>
+                {detectionResult.method === "image"
+                  ? "Cumeeira por Análise de Imagem (OpenCV.js)"
+                  : "Sugestão Geométrica (Longest Edge)"}
+              </span>
+            </div>
+          </div>
+        )}
 
         {/* Floating Real-time Turf.js Area Card */}
         <div className="absolute bottom-4 left-4 right-4 sm:right-auto bg-slate-900/95 backdrop-blur-md border border-cyan-500/30 p-4 rounded-xl shadow-2xl flex items-center justify-between gap-6 z-[1000]">

@@ -3,11 +3,21 @@
 import React, { useState } from "react";
 import dynamic from "next/dynamic";
 import { GeocodingResult } from "@/lib/geocoding";
-import { Layers, CheckCircle2, Edit3, Loader2, Sparkles, Compass, MapPin } from "lucide-react";
+import {
+  Layers,
+  CheckCircle2,
+  Edit3,
+  Loader2,
+  Sparkles,
+  Compass,
+  MapPin,
+  Eye,
+  Info,
+} from "lucide-react";
 import { ProvenanceTooltip } from "@/components/ui/ProvenanceTooltip";
 import { getCompassLabel } from "@/lib/solar-calculator";
+import { RidgeDetectionResult } from "@/lib/roof-image-analysis";
 
-// Carregamento dinâmico do mapa Leaflet no cliente para evitar erros de SSR window
 const LeafletRoofMap = dynamic(
   () => import("@/components/map/LeafletRoofMap").then((mod) => mod.LeafletRoofMap),
   {
@@ -24,20 +34,39 @@ const LeafletRoofMap = dynamic(
 interface StepMapProps {
   location: GeocodingResult;
   initialAreaM2?: number;
-  onAreaConfirmed: (areaM2: number, candidates?: [number, number] | null) => void;
+  onAreaConfirmed: (
+    areaM2: number,
+    candidates?: [number, number] | null,
+    detectionResult?: RidgeDetectionResult | null
+  ) => void;
   onBack: () => void;
 }
 
-export function StepMap({ location, initialAreaM2, onAreaConfirmed, onBack }: StepMapProps) {
+export function StepMap({
+  location,
+  initialAreaM2,
+  onAreaConfirmed,
+  onBack,
+}: StepMapProps) {
   const [areaM2, setAreaM2] = useState<number>(initialAreaM2 || 0);
   const [isManualAreaMode, setIsManualAreaMode] = useState<boolean>(false);
-  const [manualAreaValue, setManualAreaValue] = useState<string>(initialAreaM2 ? String(initialAreaM2) : "50");
+  const [manualAreaValue, setManualAreaValue] = useState<string>(
+    initialAreaM2 ? String(initialAreaM2) : "50"
+  );
   const [azimuthCandidates, setAzimuthCandidates] = useState<[number, number] | null>(null);
+  const [detectionResult, setDetectionResult] = useState<RidgeDetectionResult | null>(null);
+  const [selectedFaceIndex, setSelectedFaceIndex] = useState<0 | 1>(0);
 
   const handleConfirm = () => {
     const finalArea = isManualAreaMode ? parseFloat(manualAreaValue) || 50 : areaM2;
     if (finalArea <= 0) return;
-    onAreaConfirmed(finalArea, azimuthCandidates);
+
+    let reorderedCandidates = azimuthCandidates;
+    if (azimuthCandidates && selectedFaceIndex === 1) {
+      reorderedCandidates = [azimuthCandidates[1], azimuthCandidates[0]];
+    }
+
+    onAreaConfirmed(finalArea, reorderedCandidates, detectionResult);
   };
 
   return (
@@ -49,15 +78,15 @@ export function StepMap({ location, initialAreaM2, onAreaConfirmed, onBack }: St
           </div>
           <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
             <Layers className="w-5 h-5 text-[#ea580c]" />
-            Passo 2: Mapeamento do Telhado Residencial & Área Útil (m²)
+            Passo 2: Mapeamento do Telhado & Detecção de Cumeeira (OpenCV.js)
             <ProvenanceTooltip
-              title="Cálculo Geodésico de Área do Telhado"
-              source="Turf.js (@turf/area) sobre imagens Esri World Imagery"
-              formula="Integração esférica das coordenadas WGS84 do polígono desenhado sobre a imagem de satélite em Vitória-ES."
+              title="Cálculo Geodésico & Análise de Imagem"
+              source="Turf.js (@turf/area) + OpenCV.js (WASM Client-side)"
+              formula="Vetores geodésicos WGS84 e segmentação de brilho/sombra por K-Means/Otsu diretamente no navegador."
             />
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Utilize a ferramenta de polígono no mapa para desenhar o contorno do telhado residencial. O sistema calculará a área e os azimutes das duas águas automaticamente.
+            Desenhe o contorno do telhado no mapa. A análise automática de imagem (OpenCV.js) identificará a cumeeira pelas sombras das duas águas, sugerindo o azimute correto.
           </p>
         </div>
 
@@ -76,42 +105,132 @@ export function StepMap({ location, initialAreaM2, onAreaConfirmed, onBack }: St
             location={location}
             initialAreaM2={areaM2}
             onAreaConfirmed={(a) => setAreaM2(a)}
-            onAzimuthCandidatesSuggested={(candidates) => setAzimuthCandidates(candidates)}
+            onAzimuthCandidatesSuggested={(candidates, result) => {
+              setAzimuthCandidates(candidates);
+              if (result) setDetectionResult(result);
+            }}
           />
 
-          {/* Card Prominente de Sugestão Automática de Azimute via Telhado */}
+          {/* Card Prominente de Sugestão de Azimute com Proveniência OpenCV.js */}
           {azimuthCandidates && (
-            <div className="p-4 rounded-2xl border-2 border-orange-200 bg-orange-50/80 text-xs space-y-2.5 shadow-sm">
-              <div className="flex items-center justify-between">
-                <span className="font-extrabold text-[#ea580c] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-                  <Sparkles className="w-4 h-4 text-[#ea580c] animate-pulse" />
-                  Sugestão Geométrica Assistida com Confirmação Manual (Turf.js)
-                </span>
-                <span className="text-[10px] font-mono bg-white text-[#ea580c] border border-orange-200 px-2.5 py-0.5 rounded-full font-bold">
-                  2 Águas Sugeridas (180° Opostos)
-                </span>
+            <div
+              className={`p-4 rounded-2xl border-2 space-y-3 shadow-sm transition-all ${
+                detectionResult?.method === "image"
+                  ? "border-orange-300 bg-orange-50/90"
+                  : "border-slate-300 bg-slate-50/90"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Sparkles
+                    className={`w-4 h-4 ${
+                      detectionResult?.method === "image"
+                        ? "text-[#ea580c] animate-pulse"
+                        : "text-slate-600"
+                    }`}
+                  />
+                  <span className="font-extrabold text-[#ea580c] uppercase tracking-wider text-[11px] flex items-center gap-1.5">
+                    {detectionResult?.method === "image"
+                      ? "Sugestão por Análise de Sombra/Brilho da Imagem"
+                      : "Sugestão Geométrica (Fallback de Baixa Confiança)"}
+                  </span>
+
+                  {detectionResult && (
+                    <ProvenanceTooltip
+                      title={
+                        detectionResult.method === "image"
+                          ? "Sugestão por Análise de Sombra/Brilho"
+                          : "Sugestão Geométrica (Longest Edge)"
+                      }
+                      source={
+                        detectionResult.method === "image"
+                          ? "OpenCV.js (WASM oficial), processado no seu navegador"
+                          : "Turf.js (@turf/bearing)"
+                      }
+                      formula={
+                        detectionResult.method === "image"
+                          ? `Segmentação K-Means/Otsu entre regiões de iluminação/sombra (Diferença de intensidade ΔB = ${
+                              detectionResult.contrastDelta ?? "N/A"
+                            }).`
+                          : detectionResult.reason ||
+                            "Aresta mais longa do contorno desenhado como fallback devido a baixo contraste."
+                      }
+                    />
+                  )}
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {detectionResult?.contrastDelta !== undefined && (
+                    <span className="text-[10px] font-mono bg-white text-slate-700 border border-slate-200 px-2 py-0.5 rounded-full font-bold">
+                      ΔB: {detectionResult.contrastDelta} / 255
+                    </span>
+                  )}
+                  <span className="text-[10px] font-mono bg-white text-[#ea580c] border border-orange-200 px-2.5 py-0.5 rounded-full font-bold">
+                    {detectionResult?.method === "image"
+                      ? "Detectado via OpenCV.js"
+                      : "Heurística Geométrica"}
+                  </span>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                <div className="bg-white p-3 rounded-xl border border-orange-200 flex items-center justify-between shadow-xs">
-                  <span className="text-slate-800 font-bold flex items-center gap-1.5">
-                    <Compass className="w-4 h-4 text-[#ea580c]" />
-                    Face A (Cumeeira): <code className="text-[#ea580c] font-extrabold font-mono text-sm">{azimuthCandidates[0]}°</code>
-                  </span>
-                  <span className="text-xs text-[#ea580c] font-bold">
-                    {getCompassLabel(azimuthCandidates[0])}
-                  </span>
-                </div>
+              <p className="text-xs text-slate-700 font-medium">
+                {detectionResult?.provenanceLabel ||
+                  "Selecione a face de instalação desejada para os painéis fotovoltaicos:"}
+              </p>
 
-                <div className="bg-white p-3 rounded-xl border border-orange-200 flex items-center justify-between shadow-xs">
-                  <span className="text-slate-800 font-bold flex items-center gap-1.5">
-                    <Compass className="w-4 h-4 text-amber-600" />
-                    Face B (Água Oposta): <code className="text-slate-900 font-extrabold font-mono text-sm">{azimuthCandidates[1]}°</code>
-                  </span>
-                  <span className="text-xs text-slate-600 font-bold">
-                    {getCompassLabel(azimuthCandidates[1])}
-                  </span>
-                </div>
+              {/* Controles de Seleção Manual da Face (Face A / Face B) */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1">
+                <button
+                  type="button"
+                  onClick={() => setSelectedFaceIndex(0)}
+                  className={`p-3.5 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+                    selectedFaceIndex === 0
+                      ? "bg-white border-[#ea580c] ring-2 ring-orange-400/40 shadow-sm"
+                      : "bg-white/60 border-slate-200 hover:border-orange-200"
+                  }`}
+                >
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <Compass className="w-4 h-4 text-[#ea580c]" />
+                      Face A (Sugerida):{" "}
+                      <code className="text-[#ea580c] font-extrabold font-mono text-sm">
+                        {azimuthCandidates[0]}°
+                      </code>
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+                      Orientação {getCompassLabel(azimuthCandidates[0])}
+                    </span>
+                  </div>
+                  {selectedFaceIndex === 0 && (
+                    <CheckCircle2 className="w-5 h-5 text-[#ea580c] shrink-0" />
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setSelectedFaceIndex(1)}
+                  className={`p-3.5 rounded-xl border transition-all text-left flex items-center justify-between cursor-pointer ${
+                    selectedFaceIndex === 1
+                      ? "bg-white border-[#ea580c] ring-2 ring-orange-400/40 shadow-sm"
+                      : "bg-white/60 border-slate-200 hover:border-orange-200"
+                  }`}
+                >
+                  <div>
+                    <span className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                      <Compass className="w-4 h-4 text-amber-600" />
+                      Face B (Água Oposta):{" "}
+                      <code className="text-slate-900 font-extrabold font-mono text-sm">
+                        {azimuthCandidates[1]}°
+                      </code>
+                    </span>
+                    <span className="text-[11px] text-slate-500 font-medium block mt-0.5">
+                      Orientação {getCompassLabel(azimuthCandidates[1])}
+                    </span>
+                  </div>
+                  {selectedFaceIndex === 1 && (
+                    <CheckCircle2 className="w-5 h-5 text-[#ea580c] shrink-0" />
+                  )}
+                </button>
               </div>
             </div>
           )}

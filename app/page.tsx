@@ -54,6 +54,8 @@ import {
   Legend,
 } from "recharts";
 
+import { RidgeDetectionResult } from "@/lib/roof-image-analysis";
+
 export default function UnifiedSolarSightPage() {
   // Top 5-Tab Navigation State
   const [activeTab, setActiveTab] = useState<"tab1" | "tab2" | "tab3" | "tab4" | "tab5">("tab1");
@@ -63,6 +65,7 @@ export default function UnifiedSolarSightPage() {
   const [location, setLocation] = useState<GeocodingResult | null>(null);
   const [roofAreaM2, setRoofAreaM2] = useState<number>(0);
   const [azimuthCandidates, setAzimuthCandidates] = useState<[number, number] | null>(null);
+  const [roofRidgeResult, setRoofRidgeResult] = useState<RidgeDetectionResult | null>(null);
   const [selectedPanel, setSelectedPanel] = useState<SolarPanel | null>(null);
   const [installedCapacityKwp, setInstalledCapacityKwp] = useState<number>(0);
   const [estimatedModuleCount, setEstimatedModuleCount] = useState<number>(0);
@@ -93,9 +96,14 @@ export default function UnifiedSolarSightPage() {
     setCurrentStep(2);
   };
 
-  const handleAreaConfirmed = (area: number, candidates?: [number, number] | null) => {
+  const handleAreaConfirmed = (
+    area: number,
+    candidates?: [number, number] | null,
+    detectionResult?: RidgeDetectionResult | null
+  ) => {
     setRoofAreaM2(area);
     if (candidates) setAzimuthCandidates(candidates);
+    if (detectionResult) setRoofRidgeResult(detectionResult);
     setCurrentStep(3);
   };
 
