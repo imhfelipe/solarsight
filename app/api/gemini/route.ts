@@ -105,26 +105,33 @@ ${JSON.stringify(reportSummary, null, 2)}`;
       },
     };
 
-    // Call Gemini 2.0 Flash REST API endpoint (with fallback to 1.5 Flash)
-    let apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-    let response = await fetch(apiEndpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    // Call Gemini REST API endpoints (primary: gemini-3.6-flash, fallbacks: gemini-3.5-flash, gemini-2.5-flash)
+    const modelsToTry = ["gemini-3.6-flash", "gemini-3.5-flash", "gemini-2.5-flash", "gemini-2.5-pro"];
+    let response: Response | null = null;
+    let lastErrorText = "";
 
-    if (!response.ok && response.status === 404) {
-      // Fallback to gemini-1.5-flash if 2.0-flash model ID is unavailable
-      apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-      response = await fetch(apiEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+    for (const model of modelsToTry) {
+      const apiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+      try {
+        const res = await fetch(apiEndpoint, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (res.ok) {
+          response = res;
+          break;
+        } else {
+          lastErrorText = await res.text();
+          console.error(`Gemini API Model ${model} failed (${res.status}):`, lastErrorText);
+        }
+      } catch (err) {
+        console.error(`Gemini API Fetch Error for model ${model}:`, err);
+      }
     }
 
-    if (!response.ok) {
-      console.error("Gemini API HTTP Error:", response.status, response.statusText);
+    if (!response || !response.ok) {
       return NextResponse.json(
         { error: "Não foi possível gerar a explicação agora — tente novamente em instantes." },
         { status: 500 }
