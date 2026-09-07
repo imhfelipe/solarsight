@@ -15,10 +15,17 @@ import {
   Maximize2,
   Sun,
   ShieldCheck,
+  Building,
+  Zap,
+  Eye,
+  ArrowRight,
 } from "lucide-react";
 import { ProvenanceTooltip } from "@/components/ui/ProvenanceTooltip";
 import { getCompassLabel } from "@/lib/solar-calculator";
 import { RidgeDetectionResult } from "@/lib/roof-image-analysis";
+import { ShowcaseRoof } from "@/components/map/LeafletRoofMap";
+import vitoriaBairrosData from "@/data/vitoria-bairros.json";
+import showcaseRoofsData from "@/data/showcase-roofs.json";
 
 const LeafletRoofMap = dynamic(
   () => import("@/components/map/LeafletRoofMap").then((mod) => mod.LeafletRoofMap),
@@ -59,6 +66,40 @@ export function StepMap({
   const [detectionResult, setDetectionResult] = useState<RidgeDetectionResult | null>(null);
   const [selectedFaceIndex, setSelectedFaceIndex] = useState<0 | 1>(0);
 
+  // Showcase & Neighborhood Filter States
+  const [viewMode, setViewMode] = useState<"satellite" | "energy">("satellite");
+  const [selectedBairroId, setSelectedBairroId] = useState<string>("camburi");
+  const [showcaseRoofToInject, setShowcaseRoofToInject] = useState<ShowcaseRoof | null>(null);
+
+  // Current selected neighborhood metadata
+  const selectedBairroFeature = vitoriaBairrosData.features.find(
+    (f) => f.properties.id === selectedBairroId
+  );
+  const selectedShowcase = showcaseRoofsData.find(
+    (r) => r.bairroId === selectedBairroId
+  ) as ShowcaseRoof | undefined;
+
+  const handleSelectBairro = (bairroId: string) => {
+    setSelectedBairroId(bairroId);
+    setViewMode("energy");
+  };
+
+  const handleTriggerShowcase = (targetBairroId?: string) => {
+    const bId = targetBairroId || selectedBairroId;
+    const showcase = showcaseRoofsData.find(
+      (r) => r.bairroId === bId
+    ) as ShowcaseRoof | undefined;
+
+    if (showcase) {
+      setShowcaseRoofToInject(null);
+      // Trigger update on next frame to force effect re-run if re-clicking same showcase
+      setTimeout(() => {
+        setShowcaseRoofToInject(showcase);
+        setViewMode("satellite");
+      }, 50);
+    }
+  };
+
   const handleConfirm = () => {
     const finalArea = isManualAreaMode ? parseFloat(manualAreaValue) || 50 : areaM2;
     if (finalArea <= 0) return;
@@ -77,7 +118,7 @@ export function StepMap({
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 text-[11px] font-bold uppercase tracking-wider mb-1.5">
-            <MapPin className="w-3 h-3 text-[#ea580c]" /> Vitória - ES (Imóvel Residencial)
+            <MapPin className="w-3 h-3 text-[#ea580c]" /> Vitória - ES (Mapeamento & Showcase)
           </div>
           <h2 className="text-xl font-extrabold text-slate-900 flex items-center gap-2">
             <Layers className="w-5 h-5 text-[#ea580c]" />
@@ -89,18 +130,72 @@ export function StepMap({
             />
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Desenhe o contorno do telhado sobre a imagem de satélite. O sistema calculará a área geodésica real e detectará a cumeeira por análise de sombra em tempo real.
+            Filtre os bairros de Vitória para ver o potencial solar macro, ou selecione uma casa de exemplo pré-calculada para testar o OpenCV.js ao vivo.
           </p>
         </div>
 
-        <button
-          onClick={() => setIsManualAreaMode(!isManualAreaMode)}
-          className="text-xs text-slate-700 hover:text-[#ea580c] font-bold underline flex items-center gap-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3.5 py-2 rounded-xl shrink-0 transition cursor-pointer"
-        >
-          <Edit3 className="w-3.5 h-3.5" />
-          {isManualAreaMode ? "Usar Desenho no Mapa" : "Inserção Manual em m²"}
-        </button>
+        <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+          {/* Select de Bairros de Vitória */}
+          <div className="flex items-center gap-1.5 bg-slate-50 border border-slate-300 rounded-xl px-3 py-1.5">
+            <Building className="w-4 h-4 text-[#ea580c] shrink-0" />
+            <select
+              value={selectedBairroId}
+              onChange={(e) => handleSelectBairro(e.target.value)}
+              className="bg-transparent text-xs font-bold text-slate-900 border-none outline-none cursor-pointer pr-1"
+            >
+              {vitoriaBairrosData.features.map((f) => (
+                <option key={f.properties.id} value={f.properties.id}>
+                  {f.properties.nome}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <button
+            onClick={() => setIsManualAreaMode(!isManualAreaMode)}
+            className="text-xs text-slate-700 hover:text-[#ea580c] font-bold underline flex items-center gap-1 bg-slate-100 hover:bg-slate-200 border border-slate-300 px-3 py-2 rounded-xl shrink-0 transition cursor-pointer"
+          >
+            <Edit3 className="w-3.5 h-3.5" />
+            {isManualAreaMode ? "Usar Desenho no Mapa" : "Inserção Manual em m²"}
+          </button>
+        </div>
       </div>
+
+      {/* Card Flutuante de Destaque do Bairro Selecionado */}
+      {selectedBairroFeature && !isManualAreaMode && (
+        <div className="bg-gradient-to-r from-slate-900 via-slate-950 to-slate-900 text-white p-4 sm:p-5 rounded-2xl border border-slate-800 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="bg-[#ea580c]/20 text-orange-400 border border-orange-500/40 text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-full">
+                Bairro Selecionado
+              </span>
+              <h3 className="text-base font-extrabold text-white flex items-center gap-2">
+                <Building className="w-4 h-4 text-cyan-400" />
+                {selectedBairroFeature.properties.nome}
+              </h3>
+            </div>
+            <p className="text-xs text-slate-400">
+              Potencial Solar Consolidado:{" "}
+              <strong className="text-cyan-400 font-mono">
+                {selectedBairroFeature.properties.potencialAnualGwh} GWh/ano
+              </strong>{" "}
+              &bull; Irradiação:{" "}
+              <strong className="text-amber-400 font-mono">
+                {selectedBairroFeature.properties.irradiacaoMedia} kWh/m²/dia
+              </strong>
+            </p>
+          </div>
+
+          {/* Botão de Transição Macro -> Micro (Showcase Roof) */}
+          <button
+            onClick={() => handleTriggerShowcase(selectedBairroId)}
+            className="w-full md:w-auto px-4 py-2.5 bg-gradient-to-r from-cyan-500 via-teal-500 to-emerald-500 hover:from-cyan-600 hover:to-emerald-600 text-slate-950 font-extrabold text-xs rounded-xl shadow-lg hover:shadow-cyan-500/20 transition flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+          >
+            <Sparkles className="w-4 h-4 fill-slate-950" />
+            Visualizar Casa de Exemplo neste Bairro &rarr;
+          </button>
+        </div>
+      )}
 
       {!isManualAreaMode ? (
         <div className="space-y-4">
@@ -112,6 +207,11 @@ export function StepMap({
               setAzimuthCandidates(candidates);
               if (result) setDetectionResult(result);
             }}
+            viewMode={viewMode}
+            onViewModeChange={(mode) => setViewMode(mode)}
+            selectedBairroId={selectedBairroId}
+            onBairroSelect={(id) => handleSelectBairro(id)}
+            showcaseRoofToInject={showcaseRoofToInject}
           />
 
           {/* Painel Explicativo Transparente: Como Área, Inclinação e Direção são Calculados */}

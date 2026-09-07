@@ -1,0 +1,107 @@
+[
+  {
+    "bairroId": "camburi",
+    "bairroNome": "Jardim Camburi",
+    "address": "R. Maria Eleonora Pereira, Jardim Camburi - Vitória, ES",
+    "center": [-20.27054, -40.29021],
+    "coordinates": [
+      [-40.29031, -20.27045],
+      [-40.29011, -20.27045],
+      [-40.29011, -20.27063],
+      [-40.29031, -20.27063]
+    ],
+    "azimutePreCalculado": 45,
+    "areaCalculadaM2": 95.4,
+    "descricao": "Telhado residencial 2 águas com cumeeira orientada no sentido Nordeste/Sudoeste."
+  },
+  {
+    "bairroId": "praia_do_canto",
+    "bairroNome": "Praia do Canto",
+    "address": "R. Aleixo Netto, Praia do Canto - Vitória, ES",
+    "center": [-20.30612, -40.29145],
+    "coordinates": [
+      [-40.29158, -20.30602],
+      [-40.29135, -20.30602],
+      [-40.29135, -20.30622],
+      [-40.29158, -20.30622]
+    ],
+    "azimutePreCalculado": 15,
+    "areaCalculadaM2": 112.0,
+    "descricao": "Residência unifamiliar com inclinação voltada para o Norte solar."
+  },
+  {
+    "bairroId": "jardim_da_penha",
+    "bairroNome": "Jardim da Penha",
+    "address": "Av. Francisco Generoso da Fonseca, Jardim da Penha - Vitória, ES",
+    "center": [-20.28834, -40.29280],
+    "coordinates": [
+      [-40.29292, -20.28825],
+      [-40.29268, -20.28825],
+      [-40.29268, -20.28843],
+      [-40.29292, -20.28843]
+    ],
+    "azimutePreCalculado": 0,
+    "areaCalculadaM2": 88.5,
+    "descricao": "Casa geminada com excelente exposição solar direta para o Norte."
+  },
+  {
+    "bairroId": "enseada_do_sua",
+    "bairroNome": "Enseada do Suá",
+    "address": "Av. Nossa Sra. dos Navegantes, Enseada do Suá - Vitória, ES",
+    "center": [-20.31890, -40.28910],
+    "coordinates": [
+      [-40.28925, -20.31880],
+      [-40.28895, -20.31880],
+      [-40.28895, -20.31900],
+      [-40.28925, -20.31900]
+    ],
+    "azimutePreCalculado": 90,
+    "areaCalculadaM2": 140.2,
+    "descricao": "Telhado comercial/residencial com inclinação Leste-Oeste."
+  },
+  {
+    "bairroId": "mata_da_praia",
+    "bairroNome": "Mata da Praia",
+    "address": "Av. Des. Dermeval Lyrio, Mata da Praia - Vitória, ES",
+    "center": [-20.27640, -40.29450],
+    "coordinates": [
+      [-40.29465, -20.27630],
+      [-40.29435, -20.27630],
+      [-40.29435, -20.27650],
+      [-40.29465, -20.27650]
+    ],
+    "azimutePreCalculado": 30,
+    "areaCalculadaM2": 125.8,
+    "descricao": "Sobrado com cobertura limpa sem sombreamento de árvores."
+  },
+  {
+    "bairroId": "bento_ferreira",
+    "bairroNome": "Bento Ferreira",
+    "address": "R. Chafic Murad, Bento Ferreira - Vitória, ES",
+    "center": [-20.31560, -40.30420],
+    "coordinates": [
+      [-40.30435, -20.31550],
+      [-40.30405, -20.31550],
+      [-40.30405, -20.31570],
+      [-40.30435, -20.31570]
+    ],
+    "azimutePreCalculado": 340,
+    "areaCalculadaM2": 105.0,
+    "descricao": "Residência padrão com duas águas e cumeeira bem definida."
+  },
+  {
+    "bairroId": "santa_lucia",
+    "bairroNome": "Santa Lúcia",
+    "address": "R. Das Palmeiras, Santa Lúcia - Vitória, ES",
+    "center": [-20.30920, -40.29870],
+    "coordinates": [
+      [-40.29885, -20.30910],
+      [-40.29855, -20.30910],
+      [-40.29855, -20.30930],
+      [-40.29885, -20.30930]
+    ],
+    "azimutePreCalculado": 10,
+    "areaCalculadaM2": 98.6,
+    "descricao": "Telhado cerâmico tradicional com orientação preferencial Norte."
+  }
+]
