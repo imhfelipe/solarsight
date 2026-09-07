@@ -6,6 +6,7 @@ import { GeocodingResult } from "@/lib/geocoding";
 import { AnimatedNumber } from "@/components/ui/AnimatedNumber";
 import { ProvenanceTooltip } from "@/components/ui/ProvenanceTooltip";
 import { Card3D } from "@/components/ui/Card3D";
+import { GeminiReportExplainer } from "@/components/ui/GeminiReportExplainer";
 import {
   ResponsiveContainer,
   ComposedChart,
@@ -203,6 +204,14 @@ export function StepDiagnosis({
           <span className="text-[10px] text-slate-500 block">Acumulada com degradação</span>
         </div>
       </div>
+
+      {/* Camada Explicativa em Linguagem Natural via Gemini API (Google AI Studio) */}
+      <GeminiReportExplainer
+        prediction={prediction}
+        location={location}
+        panel={panel}
+        roofAreaM2={roofAreaM2}
+      />
 
       {/* Navegação de Abas dos Gráficos Preditivos */}
       <div className="bg-slate-900/90 border border-slate-800 p-1.5 rounded-2xl flex flex-wrap items-center justify-between text-xs gap-2">

@@ -1,6 +1,7 @@
 import { runValidationAnalysis } from "@/lib/solar-calculator";
 import { testSolarCalculatorEngine } from "@/__tests__/solar-calculator.test";
 import { testRoofImageAnalysisEngine } from "@/__tests__/roof-image-analysis.test";
+import { testGeminiApiIntegration } from "@/__tests__/gemini-api.test";
 
 console.log("========================================================================");
 console.log("1. EXECUÇÃO DOS TESTES UNITÁRIOS DO SISTEMA SOLARSIGHT");
@@ -8,6 +9,7 @@ console.log("===================================================================
 
 testSolarCalculatorEngine();
 testRoofImageAnalysisEngine();
+testGeminiApiIntegration();
 
 console.log("\n========================================================================");
 console.log("2. EXECUÇÃO DIRETA DO MÉTODO runValidationAnalysis() SOBRE validation-systems.json");

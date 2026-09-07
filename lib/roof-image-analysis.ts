@@ -1,6 +1,5 @@
 "use client";
 
-import L from "leaflet";
 import * as turf from "@turf/turf";
 import { loadOpenCV } from "./opencv-loader";
 
@@ -87,8 +86,8 @@ export function computeGeometricFallback(
  * or if OpenCV/WASM is unavailable.
  */
 export async function analyzeRoofImageRidge(
-  map: L.Map,
-  polygonLayer: L.Polygon
+  map: any,
+  polygonLayer: any
 ): Promise<RidgeDetectionResult> {
   const geoJson = polygonLayer.toGeoJSON() as GeoJSON.Feature<GeoJSON.Polygon>;
   const geoCoords = geoJson.geometry.coordinates[0] as [number, number][];
@@ -99,8 +98,10 @@ export async function analyzeRoofImageRidge(
     return fallbackResult;
   }
 
+  const L = (await import("leaflet")).default;
+
   try {
-    const latLngs = polygonLayer.getLatLngs()[0] as L.LatLng[];
+    const latLngs = polygonLayer.getLatLngs()[0] as any[];
     if (!latLngs || latLngs.length < 3) return fallbackResult;
 
     // 1. Calculate screen coordinates of polygon points
@@ -136,14 +137,13 @@ export async function analyzeRoofImageRidge(
 
     if (!ctx) return fallbackResult;
 
-    const mapContainer = map.getContainer();
+    const mapContainer = map.getContainer() as HTMLElement;
     const mapRect = mapContainer.getBoundingClientRect();
-    const tileImgs = mapContainer.querySelectorAll<HTMLImageElement>(
-      ".leaflet-tile-container img"
-    );
+    const tileImgs = Array.from(mapContainer.querySelectorAll(".leaflet-tile-container img"));
 
     let tilesDrawn = 0;
-    tileImgs.forEach((img) => {
+    tileImgs.forEach((element) => {
+      const img = element as HTMLImageElement;
       if (img.complete && img.naturalWidth > 0) {
         const imgRect = img.getBoundingClientRect();
         const tileLeftOnMap = imgRect.left - mapRect.left;
