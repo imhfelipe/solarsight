@@ -8,6 +8,7 @@ import "leaflet-draw";
 import * as turf from "@turf/turf";
 import { GeocodingResult } from "@/lib/geocoding";
 import { RotateCcw, Loader2, Sparkles, Compass } from "lucide-react";
+import { ProvenanceTooltip } from "@/components/ui/ProvenanceTooltip";
 import {
   analyzeRoofImageRidge,
   RidgeDetectionResult,
@@ -264,8 +265,13 @@ export function LeafletRoofMap({
         {/* Floating Real-time Turf.js Area Card */}
         <div className="absolute bottom-4 left-4 right-4 sm:right-auto bg-slate-900/95 backdrop-blur-md border border-cyan-500/30 p-4 rounded-xl shadow-2xl flex items-center justify-between gap-6 z-[1000]">
           <div>
-            <span className="text-xs text-slate-400 uppercase tracking-wider block font-semibold">
+            <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold flex items-center gap-1.5">
               Área Útil do Telhado (Turf.js)
+              <ProvenanceTooltip
+                title="Cálculo Geodésico da Área Útil"
+                source="Turf.js (@turf/area)"
+                formula="Integração esférica das coordenadas vetoriais WGS84 do polígono desenhado sobre as imagens de satélite Esri World Imagery."
+              />
             </span>
             <div className="flex items-baseline gap-1.5 mt-0.5">
               <span className="text-3xl font-extrabold text-cyan-400 font-mono">
@@ -273,6 +279,9 @@ export function LeafletRoofMap({
               </span>
               <span className="text-sm font-semibold text-slate-300">m²</span>
             </div>
+            <span className="text-[10px] text-slate-400 block mt-0.5">
+              Vetores WGS84 sobre Esri World Imagery
+            </span>
           </div>
 
           {areaM2 > 0 && (

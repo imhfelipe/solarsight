@@ -11,8 +11,10 @@ import {
   Sparkles,
   Compass,
   MapPin,
-  Eye,
   Info,
+  Maximize2,
+  Sun,
+  ShieldCheck,
 } from "lucide-react";
 import { ProvenanceTooltip } from "@/components/ui/ProvenanceTooltip";
 import { getCompassLabel } from "@/lib/solar-calculator";
@@ -71,6 +73,7 @@ export function StepMap({
 
   return (
     <div className="space-y-6 font-sans">
+      {/* Cabeçalho do Passo 2 */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white border border-slate-200 p-5 rounded-2xl shadow-sm">
         <div>
           <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-orange-50 text-[#ea580c] border border-orange-200 text-[11px] font-bold uppercase tracking-wider mb-1.5">
@@ -82,11 +85,11 @@ export function StepMap({
             <ProvenanceTooltip
               title="Cálculo Geodésico & Análise de Imagem"
               source="Turf.js (@turf/area) + OpenCV.js (WASM Client-side)"
-              formula="Vetores geodésicos WGS84 e segmentação de brilho/sombra por K-Means/Otsu diretamente no navegador."
+              formula="Integração geodésica WGS84 para área útil e segmentação por brilho/sombra (K-Means/Otsu) para cumeeira."
             />
           </h2>
           <p className="text-xs text-slate-600 mt-1">
-            Desenhe o contorno do telhado no mapa. A análise automática de imagem (OpenCV.js) identificará a cumeeira pelas sombras das duas águas, sugerindo o azimute correto.
+            Desenhe o contorno do telhado sobre a imagem de satélite. O sistema calculará a área geodésica real e detectará a cumeeira por análise de sombra em tempo real.
           </p>
         </div>
 
@@ -110,6 +113,55 @@ export function StepMap({
               if (result) setDetectionResult(result);
             }}
           />
+
+          {/* Painel Explicativo Transparente: Como o Telhado é Calculado */}
+          <div className="bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 space-y-4 shadow-md">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-orange-400 flex items-center gap-2">
+                <Info className="w-4 h-4 text-[#ea580c]" />
+                Como o Cálculo do Telhado é Realizado (Metodologia Transparente)
+              </span>
+              <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-semibold border border-slate-700">
+                100% Processado no Navegador (Client-side)
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
+              {/* Box 1: Cálculo da Área Útil */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-cyan-400 flex items-center gap-1.5 text-xs">
+                    <Maximize2 className="w-3.5 h-3.5" /> 1. Cálculo da Área Útil em m² (Turf.js)
+                  </span>
+                  <ProvenanceTooltip
+                    title="Cálculo de Área Esférica WGS84"
+                    source="Turf.js (@turf/area)"
+                    formula="Integração esférica das coordenadas WGS84 do polígono desenhado sobre os tiles de satélite Esri World Imagery."
+                  />
+                </div>
+                <p className="text-slate-300 leading-relaxed text-[11px]">
+                  O contorno desenhado é convertido em polígono geodésico WGS84. A biblioteca <code className="text-cyan-400 font-mono">@turf/area</code> calcula a área real em metros quadrados ($m^2$), projetando a curvatura terrestre local na latitude de Vitória-ES (~20.31°S).
+                </p>
+              </div>
+
+              {/* Box 2: Detecção de Cumeeira por Imagem */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-orange-400 flex items-center gap-1.5 text-xs">
+                    <Sun className="w-3.5 h-3.5" /> 2. Orientação & Cumeeira (OpenCV.js WASM)
+                  </span>
+                  <ProvenanceTooltip
+                    title="Análise de Sombra/Brilho por Visão Computacional"
+                    source="OpenCV.js (Build WASM Oficial)"
+                    formula="Recorte em canvas da área do polígono, conversão para escala de cinza, filtro Gaussiano, segmentação K-Means/Otsu do contraste (ΔB) e extração da linha via Canny + HoughLinesP."
+                  />
+                </div>
+                <p className="text-slate-300 leading-relaxed text-[11px]">
+                  A imagem de satélite do telhado é recortada na memória. O algoritmo OpenCV.js analisa o contraste entre o lado iluminado e o lado sombreado ($\Delta B$). A linha de separação é extraída como cumeeira e converte-se o rumo em azimutes das duas águas (bearing $\pm 90^\circ$).
+                </p>
+              </div>
+            </div>
+          </div>
 
           {/* Card Prominente de Sugestão de Azimute com Proveniência OpenCV.js */}
           {azimuthCandidates && (
