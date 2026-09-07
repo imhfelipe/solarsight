@@ -390,37 +390,48 @@ export function StepDiagnosis({
             Parâmetros & Metodologia Preditiva ({INSTITUTION_NAME})
           </h3>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-xs">
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
               <span className="text-cyan-400 font-bold block flex items-center justify-between">
-                Inclinação Latitudinal
-                <ProvenanceTooltip sourceText="Calculado dinamicamente pela latitude (|lat|)" />
+                Área Útil Geodésica
+                <ProvenanceTooltip sourceText="Calculado via Turf.js (@turf/area) sobre imagens Esri World Imagery" />
               </span>
-              <p className="text-slate-300 font-mono text-base font-bold">Tilt = |{location.lat.toFixed(2)}°|</p>
-              <p className="text-slate-400 leading-relaxed">
-                Determinado estritamente a partir da latitude geográfica local para máxima captação anual.
+              <p className="text-slate-300 font-mono text-base font-bold">{roofAreaM2} m²</p>
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Calculado a partir da vetorização do contorno sobre a superfície terrestre no elipsoide WGS84.
               </p>
             </div>
 
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
               <span className="text-emerald-400 font-bold block flex items-center justify-between">
-                Marco Legal GD (Lei 14.300)
-                <ProvenanceTooltip sourceText="Transição tarifária do Fio B EDP-ES" />
+                Inclinação Latitudinal
+                <ProvenanceTooltip sourceText="Calculado dinamicamente pela latitude (|lat|)" />
               </span>
-              <p className="text-slate-300 font-mono text-base font-bold">15% a 100% Fio B</p>
-              <p className="text-slate-400 leading-relaxed">
-                Regra de transição progressiva de cobrança sobre os créditos compensados (2023 a 2029+).
+              <p className="text-slate-300 font-mono text-base font-bold">Tilt = |{location.lat.toFixed(2)}°|</p>
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Ajustado automaticamente pela latitude local para máxima captação anual de irradiação (POA).
+              </p>
+            </div>
+
+            <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+              <span className="text-orange-400 font-bold block flex items-center justify-between">
+                Direção (Azimute)
+                <ProvenanceTooltip sourceText="OpenCV.js WASM por sombra/brilho ou fallback geométrico por rumo" />
+              </span>
+              <p className="text-slate-300 font-mono text-base font-bold">{prediction.azimuthDegrees}° ({prediction.azimuthDegrees === 0 ? "Norte" : prediction.azimuthDegrees === 180 ? "Sul" : prediction.azimuthDegrees > 0 && prediction.azimuthDegrees < 180 ? "Leste" : "Oeste"})</p>
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Detectado por contraste de luz/sombra na cumeeira via visão computacional ou rumo da aresta.
               </p>
             </div>
 
             <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
               <span className="text-amber-400 font-bold block flex items-center justify-between">
-                Modelo de Referência
-                <ProvenanceTooltip sourceText="Painel fotovoltaico pré-definido selecionado" />
+                Marco Legal GD
+                <ProvenanceTooltip sourceText="Lei 14.300/2022 (Fio B EDP-ES)" />
               </span>
-              <p className="text-slate-300 font-mono text-base font-bold">{panel.model}</p>
-              <p className="text-slate-400 leading-relaxed">
-                {panel.powerWp}Wp com eficiência de {(panel.efficiency * 100).toFixed(1)}% ({panel.cellTech}).
+              <p className="text-slate-300 font-mono text-base font-bold">Lei 14.300 / EDP-ES</p>
+              <p className="text-slate-400 leading-relaxed text-[11px]">
+                Regra de transição tarifária progressiva de cobrança sobre os créditos compensados (2023-2029+).
               </p>
             </div>
           </div>

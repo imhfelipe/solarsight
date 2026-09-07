@@ -91,49 +91,50 @@ export function GeminiReportExplainer({
   };
 
   return (
-    <div className="bg-gradient-to-r from-violet-950/40 via-slate-900 to-indigo-950/40 border border-violet-500/30 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl relative overflow-hidden font-sans">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-violet-500/20 pb-4">
+    <div className="bg-white border-2 border-purple-200 rounded-3xl p-6 sm:p-8 space-y-6 shadow-md relative overflow-hidden font-sans text-slate-900">
+      {/* Cabeçalho do Card com Alto Contraste */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-purple-100 pb-4">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-0.5 rounded-full bg-violet-500/10 text-violet-300 border border-violet-500/30 text-[11px] font-bold uppercase tracking-wider mb-2">
-            <Sparkles className="w-3.5 h-3.5 text-violet-400" /> Camada de Interpretação por IA (Gemini API)
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-purple-100 text-purple-900 border border-purple-300 text-[11px] font-extrabold uppercase tracking-wider mb-2">
+            <Sparkles className="w-3.5 h-3.5 text-purple-700" /> Camada de Interpretação por IA (Gemini API)
           </div>
-          <h3 className="text-xl font-extrabold text-white flex items-center gap-2">
-            <Bot className="w-6 h-6 text-violet-400" />
-            Explicação em Linguagem Natural do Relatório
+          <h3 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight flex items-center gap-2.5">
+            <Bot className="w-6 h-6 text-purple-600 shrink-0" />
+            <span>Explicação em Linguagem Natural do Relatório</span>
             <ProvenanceTooltip
               title="Explicação por Inteligência Artificial"
               source="Gemini API (Google AI Studio - Gemini Flash)"
               formula="Análise interpretativa em linguagem natural baseada exclusivamente nos números determinísticos já calculados. Nenhum valor físico/financeiro é alterado."
             />
           </h3>
-          <p className="text-xs text-slate-300 mt-1">
+          <p className="text-xs sm:text-sm text-slate-700 mt-1 font-medium leading-relaxed">
             Utilize a inteligência artificial para traduzir os dados técnicos do simulador em linguagem acessível ou tirar dúvidas sobre o seu relatório.
           </p>
         </div>
 
-        {/* Feature B: Explicar em Linguagem Simples Button */}
+        {/* Feature B: Botão Explicar em Linguagem Simples */}
         <button
           onClick={() => fetchExplanation("summary")}
           disabled={isLoading || sessionCount >= MAX_SESSION_REQUESTS}
-          className={`px-4 py-2.5 rounded-xl font-bold text-xs shadow-md transition flex items-center gap-2 shrink-0 cursor-pointer ${
+          className={`px-5 py-3 rounded-xl font-bold text-xs shadow-sm transition flex items-center gap-2 shrink-0 cursor-pointer ${
             isLoading
-              ? "bg-violet-950 text-violet-400 border border-violet-500/30"
-              : "bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white"
+              ? "bg-purple-200 text-purple-800 border border-purple-300"
+              : "bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white"
           }`}
         >
           {isLoading && lastPromptType === "summary" ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
+            <Loader2 className="w-4 h-4 animate-spin text-white" />
           ) : (
-            <BookOpenCheck className="w-4 h-4" />
+            <BookOpenCheck className="w-4 h-4 text-white" />
           )}
           <span>Explicar em Linguagem Simples</span>
         </button>
       </div>
 
-      {/* Feature A: Field "Pergunte sobre seu relatório" */}
+      {/* Feature A: Formulário de Pergunta Livre */}
       <div className="space-y-3">
-        <label className="text-xs font-bold text-slate-200 flex items-center gap-1.5 uppercase tracking-wider">
-          <HelpCircle className="w-4 h-4 text-violet-400" /> Pergunte sobre seu relatório solar:
+        <label className="text-xs font-extrabold text-slate-900 flex items-center gap-1.5 uppercase tracking-wider">
+          <HelpCircle className="w-4 h-4 text-purple-600" /> Pergunte sobre seu relatório solar:
         </label>
 
         <form
@@ -141,24 +142,24 @@ export function GeminiReportExplainer({
             e.preventDefault();
             if (userQuestion.trim()) fetchExplanation("question");
           }}
-          className="flex flex-col sm:flex-row gap-2"
+          className="flex flex-col sm:flex-row gap-2.5"
         >
           <input
             type="text"
             value={userQuestion}
             onChange={(e) => setUserQuestion(e.target.value)}
-            placeholder="Ex.: Por que a geração cai nos meses do meio do ano? O que é o Fio B?"
+            placeholder="Ex.: Por que a geração varia nos meses? Como funciona a inclinação do meu telhado?"
             disabled={isLoading || sessionCount >= MAX_SESSION_REQUESTS}
-            className="flex-1 bg-slate-950/80 border border-violet-500/30 rounded-xl px-4 py-3 text-slate-100 text-xs placeholder:text-slate-500 focus:outline-none focus:border-violet-400 focus:ring-1 focus:ring-violet-400"
+            className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-slate-900 text-xs sm:text-sm font-medium placeholder:text-slate-500 focus:outline-none focus:border-purple-600 focus:ring-2 focus:ring-purple-200 shadow-2xs"
           />
 
           <button
             type="submit"
             disabled={!userQuestion.trim() || isLoading || sessionCount >= MAX_SESSION_REQUESTS}
-            className={`px-5 py-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer ${
+            className={`px-6 py-3 rounded-xl font-bold text-xs transition flex items-center justify-center gap-2 cursor-pointer ${
               userQuestion.trim() && !isLoading
-                ? "bg-violet-600 hover:bg-violet-500 text-white shadow-md"
-                : "bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700"
+                ? "bg-purple-600 hover:bg-purple-700 text-white shadow-sm"
+                : "bg-slate-200 text-slate-500 cursor-not-allowed border border-slate-300"
             }`}
           >
             {isLoading && lastPromptType === "question" ? (
@@ -170,44 +171,44 @@ export function GeminiReportExplainer({
           </button>
         </form>
 
-        {/* Suggestion Pills */}
+        {/* Pílulas de Sugestões de Perguntas Frequentes */}
         <div className="flex flex-wrap items-center gap-2 pt-1">
-          <span className="text-[11px] text-slate-400 font-semibold">Sugestões de perguntas:</span>
+          <span className="text-[11px] text-slate-800 font-extrabold">Sugestões rápidas:</span>
           <button
             type="button"
-            onClick={() => handleQuickQuestion("Por que a geração varia nos meses do meio do ano?")}
-            className="text-[11px] bg-violet-950/60 hover:bg-violet-900/80 text-violet-200 border border-violet-500/30 px-3 py-1 rounded-full transition cursor-pointer"
+            onClick={() => handleQuickQuestion("Como foi calculada a área útil, a inclinação e a direção do meu telhado?")}
+            className="text-[11px] bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold border border-purple-300 px-3.5 py-1.5 rounded-full transition cursor-pointer shadow-2xs"
+          >
+            Como é calculada a área, inclinação e direção?
+          </button>
+          <button
+            type="button"
+            onClick={() => handleQuickQuestion("Por que a geração de energia varia ao longo dos meses do ano?")}
+            className="text-[11px] bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold border border-purple-300 px-3.5 py-1.5 rounded-full transition cursor-pointer shadow-2xs"
           >
             Por que a geração varia nos meses?
           </button>
           <button
             type="button"
-            onClick={() => handleQuickQuestion("O que é o Fio B e como afeta minha economia?")}
-            className="text-[11px] bg-violet-950/60 hover:bg-violet-900/80 text-violet-200 border border-violet-500/30 px-3 py-1 rounded-full transition cursor-pointer"
+            onClick={() => handleQuickQuestion("O que é a regra do Fio B da Lei 14.300 e como afeta a economia?")}
+            className="text-[11px] bg-purple-100/90 hover:bg-purple-200 text-purple-950 font-bold border border-purple-300 px-3.5 py-1.5 rounded-full transition cursor-pointer shadow-2xs"
           >
             O que é a regra do Fio B?
-          </button>
-          <button
-            type="button"
-            onClick={() => handleQuickQuestion("O que representa o fator de transposição K_trans?")}
-            className="text-[11px] bg-violet-950/60 hover:bg-violet-900/80 text-violet-200 border border-violet-500/30 px-3 py-1 rounded-full transition cursor-pointer"
-          >
-            O que significa K_trans?
           </button>
         </div>
       </div>
 
-      {/* Error Message Box */}
+      {/* Caixa de Erro Não-Bloqueante */}
       {errorMessage && (
-        <div className="p-4 rounded-2xl bg-rose-950/50 border border-rose-500/40 text-rose-200 text-xs flex items-center justify-between gap-3 animate-fade-in">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="p-4 rounded-2xl bg-rose-50 border border-rose-300 text-rose-900 text-xs flex items-center justify-between gap-3 animate-fade-in shadow-2xs">
+          <div className="flex items-center gap-2 font-medium">
+            <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>{errorMessage}</span>
           </div>
           {sessionCount < MAX_SESSION_REQUESTS && (
             <button
               onClick={() => fetchExplanation(lastPromptType || "summary")}
-              className="text-[11px] text-rose-300 hover:text-white underline font-bold flex items-center gap-1 shrink-0"
+              className="text-[11px] text-rose-700 hover:text-rose-950 underline font-extrabold flex items-center gap-1 shrink-0"
             >
               <RefreshCw className="w-3 h-3" /> Tentar Novamente
             </button>
@@ -215,28 +216,28 @@ export function GeminiReportExplainer({
         </div>
       )}
 
-      {/* Output Explanation Text Box */}
+      {/* Caixa de Texto Explicativo Retornado pela Gemini API */}
       {explanationText && !errorMessage && (
-        <div className="p-5 rounded-2xl bg-slate-950/90 border border-violet-500/30 space-y-3 shadow-inner">
-          <div className="flex items-center justify-between border-b border-violet-500/20 pb-2">
-            <div className="flex items-center gap-2 text-violet-300 font-bold text-xs">
-              <Bot className="w-4 h-4 text-violet-400" />
+        <div className="p-5 rounded-2xl bg-purple-50/90 border border-purple-200 space-y-3 shadow-xs">
+          <div className="flex items-center justify-between border-b border-purple-200 pb-2.5">
+            <div className="flex items-center gap-2 text-purple-950 font-extrabold text-xs">
+              <Bot className="w-4 h-4 text-purple-700" />
               <span>Explicação em Linguagem Natural</span>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 bg-violet-950/80 border border-violet-500/30 px-2 py-0.5 rounded-full font-bold">
+            <span className="text-[10px] font-mono text-purple-900 bg-white border border-purple-300 px-2.5 py-0.5 rounded-full font-bold shadow-2xs">
               Gemini API (Google AI Studio)
             </span>
           </div>
 
-          <div className="text-xs sm:text-sm text-slate-200 leading-relaxed whitespace-pre-line space-y-2">
+          <div className="text-xs sm:text-sm text-slate-900 font-normal leading-relaxed whitespace-pre-line space-y-2">
             {explanationText}
           </div>
 
-          <div className="pt-2 border-t border-violet-500/10 text-[10px] text-slate-400 flex items-center justify-between">
+          <div className="pt-2 border-t border-purple-200/80 text-[10px] text-slate-600 flex items-center justify-between font-medium">
             <span>
               * Esta explicação é uma interpretação em linguagem natural baseada exclusivamente nos dados já calculados do relatório.
             </span>
-            <span className="font-mono">
+            <span className="font-mono font-bold text-purple-900">
               Cota da sessão: {sessionCount}/{MAX_SESSION_REQUESTS}
             </span>
           </div>

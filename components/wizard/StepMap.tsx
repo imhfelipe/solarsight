@@ -114,24 +114,24 @@ export function StepMap({
             }}
           />
 
-          {/* Painel Explicativo Transparente: Como o Telhado é Calculado */}
-          <div className="bg-slate-900 text-white p-5 rounded-2xl border border-slate-800 space-y-4 shadow-md">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+          {/* Painel Explicativo Transparente: Como Área, Inclinação e Direção são Calculados */}
+          <div className="bg-slate-900 text-white p-5 sm:p-6 rounded-2xl border border-slate-800 space-y-4 shadow-md font-sans">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-800 pb-3 gap-2">
               <span className="text-xs font-extrabold uppercase tracking-wider text-orange-400 flex items-center gap-2">
                 <Info className="w-4 h-4 text-[#ea580c]" />
-                Como o Cálculo do Telhado é Realizado (Metodologia Transparente)
+                Como os Cálculos de Área, Inclinação e Direção São Realizados
               </span>
-              <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-semibold border border-slate-700">
-                100% Processado no Navegador (Client-side)
+              <span className="text-[10px] font-mono bg-slate-800 text-slate-300 px-2.5 py-0.5 rounded-full font-semibold border border-slate-700 w-fit">
+                Metodologia Científica 100% Client-side
               </span>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
-              {/* Box 1: Cálculo da Área Útil */}
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              {/* Box 1: Área Útil */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-cyan-400 flex items-center gap-1.5 text-xs">
-                    <Maximize2 className="w-3.5 h-3.5" /> 1. Cálculo da Área Útil em m² (Turf.js)
+                    <Maximize2 className="w-3.5 h-3.5" /> 1. Área Útil ($m^2$)
                   </span>
                   <ProvenanceTooltip
                     title="Cálculo de Área Esférica WGS84"
@@ -140,24 +140,41 @@ export function StepMap({
                   />
                 </div>
                 <p className="text-slate-300 leading-relaxed text-[11px]">
-                  O contorno desenhado é convertido em polígono geodésico WGS84. A biblioteca <code className="text-cyan-400 font-mono">@turf/area</code> calcula a área real em metros quadrados ($m^2$), projetando a curvatura terrestre local na latitude de Vitória-ES (~20.31°S).
+                  O contorno vetorizado é convertido em polígono geodésico WGS84. A biblioteca <code className="text-cyan-400 font-mono">@turf/area</code> calcula a superfície real em metros quadrados ($m^2$), considerando a curvatura terrestre na latitude de Vitória-ES (~20.31°S).
                 </p>
               </div>
 
-              {/* Box 2: Detecção de Cumeeira por Imagem */}
-              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-1.5">
+              {/* Box 2: Inclinação (Tilt) */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-orange-400 flex items-center gap-1.5 text-xs">
-                    <Sun className="w-3.5 h-3.5" /> 2. Orientação & Cumeeira (OpenCV.js WASM)
+                  <span className="font-bold text-emerald-400 flex items-center gap-1.5 text-xs">
+                    <Compass className="w-3.5 h-3.5" /> 2. Inclinação (Tilt Graus)
                   </span>
                   <ProvenanceTooltip
-                    title="Análise de Sombra/Brilho por Visão Computacional"
-                    source="OpenCV.js (Build WASM Oficial)"
-                    formula="Recorte em canvas da área do polígono, conversão para escala de cinza, filtro Gaussiano, segmentação K-Means/Otsu do contraste (ΔB) e extração da linha via Canny + HoughLinesP."
+                    title="Otimização Latitudinal de Inclinação"
+                    source="Modelo Erbs + Liu-Jordan (Céu Isotrópico)"
+                    formula="Ajuste automático conforme o valor absoluto da latitude geográfica local (Tilt ≈ |Lat| = 20.3°)."
                   />
                 </div>
                 <p className="text-slate-300 leading-relaxed text-[11px]">
-                  A imagem de satélite do telhado é recortada na memória. O algoritmo OpenCV.js analisa o contraste entre o lado iluminado e o lado sombreado ($\Delta B$). A linha de separação é extraída como cumeeira e converte-se o rumo em azimutes das duas águas (bearing $\pm 90^\circ$).
+                  A inclinação dos painéis ($\beta$) é definida automaticamente pelo valor da latitude da residência ($\beta \approx 20,3^\circ$). Este ângulo otimiza a captação média anual de irradiação solar incidental (POA) conforme o movimento aparente do Sol.
+                </p>
+              </div>
+
+              {/* Box 3: Direção e Cumeeira (Azimute) */}
+              <div className="bg-slate-950 p-4 rounded-xl border border-slate-800 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-orange-400 flex items-center gap-1.5 text-xs">
+                    <Sun className="w-3.5 h-3.5" /> 3. Direção (Azimute Graus)
+                  </span>
+                  <ProvenanceTooltip
+                    title="Visão Computacional & Geodésia"
+                    source="OpenCV.js WASM + @turf/bearing"
+                    formula="Segmentação por brilho (K-Means/Otsu) e detecção de cumeeira (HoughLines). Fallback para a aresta mais longa (@turf/bearing) se ΔB < 15."
+                  />
+                </div>
+                <p className="text-slate-300 leading-relaxed text-[11px]">
+                  O OpenCV.js WASM analisa o contraste ($\Delta B$) entre sombra e luz nas duas águas do telhado para localizar a cumeeira. O rumo ortogonal indica o azimute em relação ao Norte (Norte=0°, Leste=90°, Sul=180°, Oeste=270°).
                 </p>
               </div>
             </div>
